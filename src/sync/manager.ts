@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import Dexie from 'dexie';
 import { db } from '../db/db';
 import { runSession, type SessionStatus } from './session';
-import { bcHub, dropPeer, peerHub, type Conn, type Hub } from './transport';
+import { dropPeer, peerHub, type Conn, type Hub } from './transport';
 import {
   ensureIdentity, loadIdentity, upsertPeer, removePeer as forgetPeer, adoptLibrary, newPairCode, normalizeCode,
   devicePeerId, pairPeerId, PAIR_TTL_MS, type PeerInfo,
@@ -20,15 +20,7 @@ interface SyncStore {
 }
 export const useSync = create<SyncStore>(() => ({ peerState: {}, pairing: null, join: 'idle', lastChangeAt: 0 }));
 
-let hub: Hub | null = null;
-const getHub = (): Hub => {
-  if (!hub) {
-    let bc = false;
-    try { bc = localStorage.getItem('ireadbook-transport') === 'bc'; } catch { /* default */ }
-    hub = bc ? bcHub() : peerHub;
-  }
-  return hub;
-};
+const getHub = (): Hub => peerHub;
 
 const sessions = new Map<string, ReturnType<typeof runSession>>();
 let stopListening: (() => void) | null = null;
@@ -125,14 +117,17 @@ export function disconnectPeer(deviceId: string) {
 let pairTimer: ReturnType<typeof setTimeout> | undefined;
 let pairStop: (() => void) | null = null;
 
+/** Stop accepting the code. The connection already made through it stays open; the
+ *  code's peer is released when the 5 minutes are over. */
 async function endPairing(state: PairState) {
-  clearTimeout(pairTimer);
   const p = useSync.getState().pairing;
   pairStop?.(); pairStop = null;
-  if (p) {
-    useSync.setState({ pairing: { ...p, state } });
-    if (getHub() === peerHub) await dropPeer(pairPeerId(p.code));
-  }
+  if (!p) return;
+  useSync.setState({ pairing: { ...p, state } });
+  clearTimeout(pairTimer);
+  const left = Math.max(0, p.expiresAt - Date.now());
+  if (state === 'connected') setTimeout(() => dropPeer(pairPeerId(p.code)), left + 60_000);
+  else await dropPeer(pairPeerId(p.code));
 }
 
 /** This device shows a code; another device types it to join this library. */
@@ -185,13 +180,14 @@ export async function joinWithCode(input: string): Promise<JoinState> {
       upsertPeer({ deviceId: m.deviceId, name: String(m.name ?? '') });
       for (const p of (m.peers ?? []) as PeerInfo[]) upsertPeer({ deviceId: p.deviceId, name: p.name });
       useSync.setState({ join: 'syncing' });
-      const s = attach(conn, m.deviceId);
+      attach(conn, m.deviceId);
+      const started = Date.now();
       const wait = setInterval(() => {
-        if (s.status === 'synced') { clearInterval(wait); useSync.setState({ join: 'done' }); resolve('done'); }
-        if (s.status === 'closed' || s.status === 'rejected') { clearInterval(wait); useSync.setState({ join: 'error' }); resolve('error'); }
+        const st = useSync.getState().peerState[m.deviceId];
+        if (st === 'synced') { clearInterval(wait); useSync.setState({ join: 'done' }); resolve('done'); return; }
+        if (Date.now() - started > 60_000) { clearInterval(wait); useSync.setState({ join: 'error' }); resolve('error'); }
       }, 200);
       ensureListening();
-      connectAll();
     });
     conn.send({ t: 'join', deviceId: me.deviceId, name: me.deviceName });
   });

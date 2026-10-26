@@ -38,6 +38,7 @@ export default function Settings() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { navigator.storage?.persisted?.().then(setPersisted).catch(() => setPersisted(null)); }, []);
+  useEffect(() => { const h = window.location.hash.split('#')[2]; if (h) setTimeout(() => document.getElementById(h)?.scrollIntoView({ behavior: 'smooth' }), 300); }, []);
 
   const doExport = async () => {
     const blob = await exportBackup();

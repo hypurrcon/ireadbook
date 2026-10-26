@@ -19,12 +19,22 @@ export class TransportError extends Error {
 // ---------------------------------------------------------------- PeerJS (real devices)
 
 type PeerT = import('peerjs').Peer;
+
+/** Tests point PeerJS at a local server with localStorage 'ireadbook-peer-server' = 'host:port'. */
+function customServer() {
+  try {
+    const v = localStorage.getItem('ireadbook-peer-server');
+    if (!v) return {};
+    const [host, port] = v.split(':');
+    return { host, port: Number(port), path: '/', secure: false, config: { iceServers: [] } };
+  } catch { return {}; }
+}
 const peers = new Map<string, Promise<PeerT>>();
 
 function openPeer(id: string): Promise<PeerT> {
   if (!peers.has(id)) {
     const p = import('peerjs').then(({ Peer }) => new Promise<PeerT>((res, rej) => {
-      const peer = new Peer(id, { debug: 0 });
+      const peer = new Peer(id, { debug: 0, ...customServer() });
       const fail = (e: any) => {
         peers.delete(id);
         peer.destroy();
@@ -83,64 +93,6 @@ export async function dropPeer(id: string) {
   if (!p) return;
   peers.delete(id);
   try { (await p).destroy(); } catch { /* never opened */ }
-}
-
-// ---------------------------------------------------------------- BroadcastChannel (tests: two tabs)
-
-interface BcMsg { kind: 'connect' | 'accept' | 'refuse' | 'data' | 'close'; from: string; to: string; cid: string; data?: unknown }
-
-export function bcHub(): Hub {
-  const ch = new BroadcastChannel('ireadbook-bc');
-  const listening = new Map<string, (c: Conn) => void>();
-  const conns = new Map<string, { msg: ((m: any) => void)[]; close: (() => void)[]; closed: boolean }>();
-  const pending = new Map<string, { res: (c: Conn) => void; rej: (e: Error) => void }>();
-  const post = (m: BcMsg) => ch.postMessage(m);
-
-  const make = (cid: string, me: string, other: string): Conn => {
-    const st = { msg: [] as ((m: any) => void)[], close: [] as (() => void)[], closed: false };
-    conns.set(`${cid}:${me}`, st);
-    return {
-      send: (data) => { if (!st.closed) post({ kind: 'data', from: me, to: other, cid, data }); },
-      onMessage: (cb) => { st.msg.push(cb); },
-      onClose: (cb) => { st.close.push(cb); },
-      close: () => { if (!st.closed) { st.closed = true; post({ kind: 'close', from: me, to: other, cid }); st.close.forEach((f) => f()); } },
-    };
-  };
-
-  ch.onmessage = (e: MessageEvent<BcMsg>) => {
-    const m = e.data;
-    if (m.kind === 'connect') {
-      const l = listening.get(m.to);
-      if (!l) { post({ kind: 'refuse', from: m.to, to: m.from, cid: m.cid }); return; }
-      post({ kind: 'accept', from: m.to, to: m.from, cid: m.cid });
-      l(make(m.cid, m.to, m.from));
-    } else if (m.kind === 'accept') {
-      const p = pending.get(m.cid);
-      if (p) { pending.delete(m.cid); p.res(make(m.cid, m.to, m.from)); }
-    } else if (m.kind === 'refuse') {
-      // another tab may still accept; only a timeout fails the attempt
-    } else {
-      const st = conns.get(`${m.cid}:${m.to}`);
-      if (!st || st.closed) return;
-      if (m.kind === 'data') st.msg.forEach((f) => f(m.data));
-      else { st.closed = true; st.close.forEach((f) => f()); }
-    }
-  };
-
-  return {
-    async listen(id, onConn) {
-      listening.set(id, onConn);
-      return () => { listening.delete(id); };
-    },
-    connect(fromId, toId, timeoutMs = 3000) {
-      return new Promise<Conn>((res, rej) => {
-        const cid = Math.random().toString(36).slice(2);
-        const timer = setTimeout(() => { pending.delete(cid); rej(new TransportError('unavailable')); }, timeoutMs);
-        pending.set(cid, { res: (c) => { clearTimeout(timer); res(c); }, rej });
-        post({ kind: 'connect', from: fromId, to: toId, cid });
-      });
-    },
-  };
 }
 
 // ---------------------------------------------------------------- in-memory pair (unit tests)
