@@ -18,6 +18,9 @@ import { backupDue } from '../domain/backupDue';
 import { exportBackup, backupFileName } from '../backup/backup';
 import { downloadBlob } from '../share/actions';
 import { toast } from '../ui/kit';
+import { useSync } from '../sync/manager';
+import { loadIdentity } from '../sync/identity';
+import { StatusDot } from './Devices';
 
 const RoomCanvas = lazy(() => import('../three/RoomCanvas'));
 const SORTS: SortMode[] = ['status', 'genre', 'series', 'author', 'added', 'color'];
@@ -85,6 +88,7 @@ export default function Shelf() {
           <span className="muted">{streak.todayDone ? t('shelf.todayDone') : t('shelf.todayLeft', { done: Math.min(todayMin, settings.dailyGoalMin), goal: settings.dailyGoalMin })}</span>
         </div>
         <div className="shelf-tools">
+          <SyncChip onOpen={() => nav('/settings#devices')} />
           <IconButton icon="sort" label={t('shelf.sortBy')} onClick={() => setSheet(true)} className={filtered ? 'dot' : ''} />
           <IconButton icon={settings.viewMode === '3d' ? 'grid' : 'cube'} label={settings.viewMode === '3d' ? t('shelf.view2d') : t('shelf.view3d')}
             onClick={() => saveSettings({ viewMode: settings.viewMode === '3d' ? '2d' : '3d' })} />
@@ -190,5 +194,19 @@ function ShelfList({ books, sortMode, seriesNames, onOpen }: { books: Book[]; so
         });
       })}
     </div>
+  );
+}
+
+function SyncChip({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation();
+  const peerState = useSync((s) => s.peerState);
+  const peers = loadIdentity()?.peers ?? [];
+  if (!peers.length) return null;
+  const states = peers.map((p) => peerState[p.deviceId] ?? 'offline');
+  const s = states.includes('syncing') || states.includes('connecting') ? 'syncing' : states.includes('synced') ? 'synced' : 'offline';
+  return (
+    <button className="sync-chip" onClick={onOpen} aria-label={t(`sync.state.${s}`)} title={t(`sync.state.${s}`)}>
+      <StatusDot s={s} />
+    </button>
   );
 }

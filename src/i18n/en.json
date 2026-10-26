@@ -134,7 +134,8 @@
     "start5": "Read for 5 minutes",
     "toShelf": "Go to my shelf",
     "readyNoBook": "Add your first book with the + button, then start reading.",
-    "restore": "Moving from another device? Import a backup"
+    "restore": "Moving from another device? Import a backup",
+    "joinOther": "Already have a shelf on another device? Enter a link code"
   },
   "shelf": {
     "todayDone": "Today's reading done",
@@ -718,5 +719,44 @@
     "text": "Back up your shelf?",
     "later": "Later",
     "go": "Back up"
+  },
+  "sync": {
+    "title": "Linked devices",
+    "body": "Link your phone and computer to share one shelf. Data syncs directly between devices whenever both have the app open. No account needed.",
+    "thisDevice": "This device's name",
+    "unnamed": "Unnamed device",
+    "last": "last synced {{when}}",
+    "forget": "Unlink this device",
+    "forgotten": "Unlinked",
+    "pairNew": "Link a new device",
+    "enterCode": "Enter a code from another device",
+    "now": "Sync now",
+    "hint": "Sync happens when the app is open on both devices. If they can't connect, try the same Wi-Fi.",
+    "state": {
+      "offline": "Not found (open the app on both)",
+      "connecting": "Connecting…",
+      "syncing": "Syncing…",
+      "synced": "Synced"
+    },
+    "showCode": "Open the app on the other device and enter this code in Settings → Enter a code from another device",
+    "expiresIn": "Code expires in {{time}}",
+    "waiting": "Waiting for the other device",
+    "expired": "The code has expired",
+    "newCode": "Get a new code",
+    "netError": "Couldn't reach the device-finding service. Check your internet and try again",
+    "paired": "Device linked",
+    "pairedBody": "Both devices now share one shelf",
+    "enterBody": "On the device that already has your shelf, go to Settings → Link a new device and enter the 6-character code. Books on this device are merged in, not lost.",
+    "codeLabel": "6-character code",
+    "connect": "Connect",
+    "joined": "Linked and synced",
+    "join": {
+      "connecting": "Looking for the other device…",
+      "syncing": "Found it, syncing…",
+      "done": "Done",
+      "notFound": "Code not found. Check it or get a new one (codes last 5 minutes)",
+      "error": "Couldn't connect. Try the same Wi-Fi and try again",
+      "idle": " "
+    }
   }
 }

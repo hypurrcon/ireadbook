@@ -18,6 +18,8 @@ import { DECOR, decorUnlocked } from '../domain/decor';
 import { downloadBlob } from '../share/actions';
 import { useInstall, isIOS, requestPersistence } from '../state/install';
 import { setOnboardedNow } from '../state/onboard';
+import { DevicesSection } from './Devices';
+import { resetIdentity } from '../sync/identity';
 import { setVolumes, setMuted, sfx } from '../audio/sound';
 
 export default function Settings() {
@@ -69,6 +71,8 @@ export default function Settings() {
           {install.prompt && <Button variant="primary" size="sm" onClick={async () => { install.prompt.prompt(); await install.prompt.userChoice; useInstall.setState({ prompt: null }); }}>{t('settings.install')}</Button>}
         </div>
       )}
+
+      <DevicesSection />
 
       <section className="section">
         <h2>{t('settings.language')}</h2>
@@ -201,7 +205,7 @@ export default function Settings() {
         <p>{t('settings.wipeBody')}</p>
         <div className="sheet-actions">
           <Button onClick={() => setWipe(false)}>{t('common.cancel')}</Button>
-          <Button variant="danger" onClick={async () => { await resetDb(); setOnboardedNow(false); setWipe(false); nav('/welcome', { replace: true }); }}>{t('settings.wipeConfirm')}</Button>
+          <Button variant="danger" onClick={async () => { await resetDb(); resetIdentity(); setOnboardedNow(false); setWipe(false); nav('/welcome', { replace: true }); }}>{t('settings.wipeConfirm')}</Button>
         </div>
       </Sheet>
     </div>

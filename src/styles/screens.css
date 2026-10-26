@@ -321,3 +321,20 @@
 .backup-nudge button { padding: 6px 10px; border-radius: 9px; font-size: 13px; color: var(--ink-soft); }
 .backup-nudge button.go { background: var(--accent); color: var(--accent-ink); font-weight: 500; }
 .welcome-restore { margin-top: 14px; color: var(--ink-soft); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; align-self: center; padding: 8px; }
+
+/* ---------- devices / sync ---------- */
+.sync-dot { width: 10px; height: 10px; border-radius: 5px; flex: none; background: var(--ink-soft); opacity: .5; }
+.sync-dot.synced { background: #6fcf8a; opacity: 1; box-shadow: 0 0 0 3px rgba(111, 207, 138, .2); }
+.sync-dot.syncing, .sync-dot.connecting { background: var(--accent); opacity: 1; animation: pulse 1s ease-in-out infinite; }
+.sync-chip { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--bg) 70%, transparent); }
+.devices .list-item { gap: 12px; }
+.pair { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 6px 0 4px; }
+.pair-code { display: flex; gap: 8px; margin: 6px 0; min-height: 64px; align-items: center; }
+.pair-code b { width: 44px; height: 60px; display: grid; place-items: center; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); font-family: var(--font-mono); font-size: 30px; font-weight: 700; color: var(--accent); }
+.pair-timer { font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft); }
+.pair-done { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 0; }
+.pair-done svg { color: var(--accent-ink); background: var(--accent); border-radius: 50%; padding: 10px; width: 56px; height: 56px; }
+.code-input { text-align: center; font-family: var(--font-mono) !important; font-size: 28px !important; letter-spacing: .3em; margin-top: 14px; text-transform: uppercase; }
+.join-state { margin-top: 12px; font-size: 14px; text-align: center; color: var(--ink-soft); }
+.join-state.notFound, .join-state.error { color: var(--danger); }
+.join-state.done { color: var(--accent); }

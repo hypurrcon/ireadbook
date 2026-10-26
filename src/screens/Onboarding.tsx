@@ -15,6 +15,7 @@ import { requestPersistence } from '../state/install';
 import { setOnboardedNow } from '../state/onboard';
 import { importBackup, BackupError } from '../backup/backup';
 import { getSettings } from '../db/repo';
+import { JoinSheet } from './Devices';
 
 const STEPS = ['lang', 'room', 'book', 'goal', 'ready'] as const;
 type Step = typeof STEPS[number];
@@ -32,6 +33,7 @@ export default function Onboarding() {
   const [title, setTitle] = useState('');
   const [pages, setPages] = useState('');
   const restoreRef = useRef<HTMLInputElement>(null);
+  const [joinOpen, setJoinOpen] = useState(false);
 
   const restore = async (f?: File | null) => {
     if (!f) return;
@@ -80,7 +82,14 @@ export default function Onboarding() {
               <Segmented label="lang" value={lang} onChange={(v) => { setLang(v); setLanguage(v); }}
                 options={[{ value: 'th', label: 'ภาษาไทย' }, { value: 'en', label: 'English' }]} />
               <Button variant="primary" size="lg" className="welcome-next" onClick={() => go('room')}>{t('common.next')}</Button>
+              <button className="welcome-restore" onClick={() => setJoinOpen(true)}>{t('welcome.joinOther')}</button>
               <button className="welcome-restore" onClick={() => restoreRef.current?.click()}>{t('welcome.restore')}</button>
+              <JoinSheet open={joinOpen} onClose={() => setJoinOpen(false)} onJoined={async () => {
+                await saveSettings({ onboarded: true });
+                setOnboardedNow(true);
+                applyTokens((await getSettings()).room);
+                nav('/', { replace: true });
+              }} />
               <input ref={restoreRef} type="file" accept=".ireadbook,.zip,application/zip" hidden onChange={(e) => { restore(e.target.files?.[0]); e.target.value = ''; }} />
             </>
           )}

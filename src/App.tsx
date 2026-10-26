@@ -8,6 +8,7 @@ import { setVolumes, setMuted, unlockAudio } from './audio/sound';
 import { resumeQueue, retryPendingLookups } from './state/queue';
 import { useAchievementWatcher } from './state/rewards';
 import { onboardedNow } from './state/onboard';
+import { startSync } from './sync/manager';
 import './styles/ui.css';
 import './styles/screens.css';
 
@@ -29,6 +30,7 @@ function Shell() {
   useEffect(() => { if (settings) setVolumes(settings.volume); }, [settings?.volume]);
   useEffect(() => { setMuted(!!settings?.muted); }, [settings?.muted]);
   useEffect(() => {
+    startSync();
     resumeQueue();
     retryPendingLookups();
     const on = () => retryPendingLookups();
