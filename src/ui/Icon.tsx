@@ -42,6 +42,9 @@ const P: Record<string, string> = {
   barcode: 'M4 5v14M7 5v14M9.5 5v14M13 5v14M15 5v14M18 5v14M20 5v14',
   type: 'M5 6V4.5h14V6M12 4.5v15M9 19.5h6',
   refresh: 'M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15',
+  phone: 'M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2',
+  laptop: 'M5 6h14v9H5zM3 18h18M10 15.5h4',
+  sync: 'M5 9.5a7 7 0 0 1 12.5-2.5M19 5v3h-3M19 14.5A7 7 0 0 1 6.5 17M5 19v-3h3',
 };
 
 export type IconName = keyof typeof P;

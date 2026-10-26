@@ -88,6 +88,16 @@ test('link two devices with a 5-minute code; books, edits and deletions follow',
   await phone.getByRole('button', { name: 'ลบ', exact: true }).click();
   await expect.poll(async () => (await listTitles(pc)).filter({ hasText: 'เล่มที่สาม' }).count(), { timeout: 15000 }).toBe(0);
 
+  // one-tap sync from the shelf with the data-flying animation
+  await phone.goto('/#/');
+  await phone.locator('.sync-chip').click();
+  await expect(phone.locator('.sync-fx')).toBeVisible();
+  await phone.waitForTimeout(700);
+  await phone.screenshot({ path: 'test-results/sync-fx-running.png' });
+  await expect(phone.getByText(/ซิงก์เสร็จแล้ว|ข้อมูลตรงกันอยู่แล้ว/)).toBeVisible({ timeout: 20000 });
+  await phone.screenshot({ path: 'test-results/sync-fx-done.png' });
+  await phone.locator('.sync-fx').click();
+
   // reload both: they find each other again by themselves
   await phone.reload();
   await pc.reload();

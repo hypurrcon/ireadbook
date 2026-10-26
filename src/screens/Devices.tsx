@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, IconButton, Sheet, spring, toast } from '../ui/kit';
 import { Icon } from '../ui/Icon';
-import { useSync, startPairing, cancelPairing, joinWithCode, syncNow, disconnectPeer, type PeerState } from '../sync/manager';
+import { useSync, startPairing, cancelPairing, joinWithCode, syncNow, syncWith, disconnectPeer, type PeerState } from '../sync/manager';
 import { ensureIdentity, loadIdentity, updateIdentity } from '../sync/identity';
 import { currentLang } from '../i18n';
 import { sfx } from '../audio/sound';
@@ -22,6 +23,7 @@ export function DevicesSection() {
   const peerState = useSync((s) => s.peerState);
   const [pairOpen, setPairOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
+  const [fx, setFx] = useState<string | null>(null);
   const [name, setName] = useState(me.deviceName);
   const loc = currentLang() === 'th' ? 'th-TH' : 'en-GB';
 
@@ -45,6 +47,7 @@ export function DevicesSection() {
                   {p.lastSyncAt ? ` · ${t('sync.last', { when: new Date(p.lastSyncAt).toLocaleString(loc, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) })}` : ''}
                 </span>
               </span>
+              <Button size="sm" variant="primary" icon="sync" onClick={() => setFx(p.deviceId)}>{t('sync.one')}</Button>
               <IconButton icon="close" label={t('sync.forget')} onClick={() => { disconnectPeer(p.deviceId); refresh(); toast(t('sync.forgotten')); }} />
             </div>
           ))}
@@ -58,6 +61,7 @@ export function DevicesSection() {
       <p className="muted small" style={{ marginTop: 10 }}>{t('sync.hint')}</p>
       <PairSheet open={pairOpen} onClose={() => { setPairOpen(false); cancelPairing(); refresh(); }} />
       <JoinSheet open={joinOpen} onClose={() => { setJoinOpen(false); refresh(); }} />
+      <SyncFx peerId={fx} onClose={() => { setFx(null); refresh(); }} />
     </section>
   );
 }
@@ -136,5 +140,98 @@ export function JoinSheet({ open, onClose, onJoined }: { open: boolean; onClose:
         <Button variant="primary" disabled={busy || code.replace(/\s/g, '').length < 6} onClick={go}>{busy ? t('common.loading') : t('sync.connect')}</Button>
       </div>
     </Sheet>
+  );
+}
+
+const isPhone = (name: string) => /android|iphone|phone|มือถือ|mobile|ipad/i.test(name);
+
+/** Full-screen "data flying between devices" animation for a one-tap sync. */
+export function SyncFx({ peerId, onClose }: { peerId: string | null; onClose: () => void }) {
+  const { t } = useTranslation();
+  const traffic = useSync((s) => (peerId ? s.traffic[peerId] : undefined));
+  const state = useSync((s) => (peerId ? s.peerState[peerId] : undefined));
+  const me = loadIdentity() ?? ensureIdentity();
+  const peer = me.peers.find((p) => p.deviceId === peerId);
+  const [phase, setPhase] = useState<'run' | 'done' | 'failed'>('run');
+  const [started, setStarted] = useState(0);
+
+  useEffect(() => {
+    if (!peerId) return;
+    setPhase('run');
+    setStarted(Date.now());
+    syncWith(peerId).then((ok) => { if (!ok) setPhase('failed'); });
+  }, [peerId]);
+
+  useEffect(() => {
+    if (!peerId || phase !== 'run') return;
+    const i = setInterval(() => {
+      const st = useSync.getState();
+      const tr = st.traffic[peerId];
+      const quiet = !tr || Date.now() - tr.at > 900;
+      if (st.peerState[peerId] === 'synced' && quiet && Date.now() - started > 1800) { setPhase('done'); sfx('reward'); }
+      else if (Date.now() - started > 20000) setPhase(st.peerState[peerId] === 'offline' || !st.peerState[peerId] ? 'failed' : 'done');
+    }, 250);
+    return () => clearInterval(i);
+  }, [peerId, phase, started]);
+
+  const sent = traffic?.sent ?? 0, recv = traffic?.recv ?? 0;
+  const out = sent > 0, inn = recv > 0;
+  const waitingForData = phase === 'run' && !out && !inn;
+  return createPortal(
+    <AnimatePresence>
+      {peerId && (
+        <motion.div className="sync-fx" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => phase !== 'run' && onClose()}>
+          <div className="sync-stage">
+            <Device name={me.deviceName} label={t('sync.thisDeviceShort')} active={out || waitingForData} />
+            <div className="sync-wire">
+              <i className="wire" />
+              {(out || waitingForData) && phase === 'run' && <Stream dir={1} faint={waitingForData} />}
+              {(inn || waitingForData) && phase === 'run' && <Stream dir={-1} faint={waitingForData} />}
+              {phase === 'done' && <motion.span className="sync-ok" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 14 }}><Icon name="check" size={22} sw={2.4} /></motion.span>}
+            </div>
+            <Device name={peer?.name ?? ''} label={t('sync.otherShort')} active={inn || waitingForData} />
+          </div>
+          <div className="sync-caption" aria-live="polite">
+            {phase === 'failed' ? <p>{t('sync.fxFailed')}</p>
+              : phase === 'run' ? <p>{waitingForData ? t('sync.fxComparing') : t('sync.fxMoving', { n: sent + recv })}</p>
+                : (
+                  <>
+                    <strong>{sent + recv === 0 ? t('sync.fxSame') : t('sync.fxDone')}</strong>
+                    {sent > 0 && <p>{t('sync.fxSent', { n: sent, to: peer?.name ?? '' })}</p>}
+                    {recv > 0 && <p>{t('sync.fxRecv', { n: recv, from: peer?.name ?? '' })}</p>}
+                    <span className="muted small">{t('sync.fxTap')}</span>
+                  </>
+                )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
+function Device({ name, label, active }: { name: string; label: string; active: boolean }) {
+  return (
+    <div className={`sync-device ${active ? 'on' : ''}`}>
+      <motion.span className="sync-device-icon" animate={active ? { scale: [1, 1.06, 1] } : { scale: 1 }} transition={{ duration: 1.2, repeat: active ? Infinity : 0 }}>
+        <Icon name={isPhone(name) ? 'phone' : 'laptop'} size={40} sw={1.4} />
+      </motion.span>
+      <strong>{name || '—'}</strong>
+      <span className="muted small">{label}</span>
+    </div>
+  );
+}
+
+/** A stream of glowing packets running along the wire. dir 1 = left→right. */
+function Stream({ dir, faint }: { dir: 1 | -1; faint: boolean }) {
+  return (
+    <>
+      {Array.from({ length: 6 }, (_, i) => (
+        <motion.b key={i} className={`packet ${faint ? 'faint' : ''}`}
+          initial={{ left: dir === 1 ? '0%' : '100%', opacity: 0 }}
+          animate={{ left: dir === 1 ? ['0%', '100%'] : ['100%', '0%'], opacity: [0, 1, 1, 0], y: [0, dir * -10, dir * -10, 0] }}
+          transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18, ease: 'easeInOut' }} />
+      ))}
+    </>
   );
 }

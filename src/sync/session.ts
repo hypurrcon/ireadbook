@@ -8,12 +8,14 @@ export interface Hooks {
   onStatus?: (s: SessionStatus) => void;
   onPeer?: (p: { deviceId: string; name: string }) => void;
   onChanged?: (n: number) => void;
+  /** items this device sent / received in one exchange */
+  onTraffic?: (sent: number, received: number) => void;
 }
 
 type Msg =
   | { t: 'hello'; libraryId: string; key: string; deviceId: string; name: string }
   | { t: 'reject' }
-  | { t: 'manifest'; m: Manifest }
+  | { t: 'manifest'; m: Manifest; reply?: boolean }
   | { t: 'request'; r: SyncRequest }
   | { t: 'records'; p: Omit<Payload, 'images'> }
   | { t: 'image'; img: WireImage }
@@ -28,9 +30,9 @@ export function runSession(conn: Conn, d: IreadDB, me: Me, hooks: Hooks = {}) {
   const set = (s: SessionStatus) => { if (status !== s) { status = s; hooks.onStatus?.(s); } };
   const send = (m: Msg) => conn.send(m);
 
-  const sendManifest = async () => {
+  const sendManifest = async (reply = false) => {
     if (!trusted) return;
-    send({ t: 'manifest', m: await buildManifest(d) });
+    send({ t: 'manifest', m: await buildManifest(d), reply });
   };
 
   const handle = async (m: Msg) => {
@@ -46,6 +48,7 @@ export function runSession(conn: Conn, d: IreadDB, me: Me, hooks: Hooks = {}) {
     if (!trusted) return;
     switch (m.t) {
       case 'manifest': {
+        if (m.reply) await sendManifest(false);
         const removed = await applyTombstones(d, m.m.tombstones);
         if (removed) hooks.onChanged?.(removed);
         const r = planRequest(await buildManifest(d), m.m);
@@ -56,17 +59,22 @@ export function runSession(conn: Conn, d: IreadDB, me: Me, hooks: Hooks = {}) {
       }
       case 'request': {
         const p = await collectPayload(d, m.r);
+        const count = Object.values(p.records).reduce((a, rows) => a + (rows?.length ?? 0), 0) + p.images.length + (p.settings ? 1 : 0);
+        if (count) hooks.onTraffic?.(count, 0);
         send({ t: 'records', p: { records: p.records, settings: p.settings } });
         for (const img of p.images) send({ t: 'image', img });
         send({ t: 'sent' });
         break;
       }
       case 'records': {
+        const got = Object.values(m.p.records).reduce((a, rows) => a + (rows?.length ?? 0), 0) + (m.p.settings ? 1 : 0);
+        if (got) hooks.onTraffic?.(0, got);
         const n = await applyPayload(d, { ...m.p, images: [] });
         if (n) hooks.onChanged?.(n);
         break;
       }
       case 'image': {
+        hooks.onTraffic?.(0, 1);
         const n = await applyPayload(d, { records: {}, images: [m.img] });
         if (n) hooks.onChanged?.(n);
         break;
@@ -85,7 +93,7 @@ export function runSession(conn: Conn, d: IreadDB, me: Me, hooks: Hooks = {}) {
 
   return {
     /** Tell the other device we may have something new. */
-    resync: () => { queue = queue.then(sendManifest).catch(() => undefined); },
+    resync: () => { queue = queue.then(() => sendManifest(true)).catch(() => undefined); },
     close: () => conn.close(),
     get status() { return status; },
   };

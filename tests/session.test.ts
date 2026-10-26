@@ -51,3 +51,31 @@ describe('sync session over a connection', () => {
     expect(await B.books.get('late')).toBeDefined();
   });
 });
+
+describe('traffic counts (for the sync animation)', () => {
+  it('reports how many items went each way', async () => {
+    await A.books.put(book('a1', 5) as any);
+    await A.books.put(book('a2', 5) as any);
+    await B.books.put(book('b1', 5) as any);
+    const [ca, cb] = memoryPair();
+    const st: Record<string, SessionStatus> = {};
+    const tA = { sent: 0, recv: 0 };
+    runSession(ca, A, { ...lib, deviceId: 'dA', deviceName: 'A' }, { onStatus: (s) => (st.a = s), onTraffic: (s, r) => { tA.sent += s; tA.recv += r; } });
+    runSession(cb, B, { ...lib, deviceId: 'dB', deviceName: 'B' }, { onStatus: (s) => (st.b = s) });
+    await until(() => st.a === 'synced' && st.b === 'synced');
+    await new Promise((r) => setTimeout(r, 30));
+    expect(tA).toEqual({ sent: 2, recv: 1 });
+  });
+  it('resync asks the other side for its news too', async () => {
+    const [ca, cb] = memoryPair();
+    const st: Record<string, SessionStatus> = {};
+    const sa = runSession(ca, A, { ...lib, deviceId: 'dA', deviceName: 'A' }, { onStatus: (s) => (st.a = s) });
+    runSession(cb, B, { ...lib, deviceId: 'dB', deviceName: 'B' }, { onStatus: (s) => (st.b = s) });
+    await until(() => st.a === 'synced' && st.b === 'synced');
+    await B.books.put(book('fromB', 9) as any); // B changed but did not announce it
+    sa.resync();
+    const t0 = Date.now();
+    while (!(await A.books.get('fromB')) && Date.now() - t0 < 3000) await new Promise((r) => setTimeout(r, 20));
+    expect(await A.books.get('fromB')).toBeDefined();
+  });
+});

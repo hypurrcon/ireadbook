@@ -768,6 +768,17 @@
       "notFound": "Code not found. Check it or get a new one (codes last 5 minutes)",
       "error": "Couldn't connect. Try the same Wi-Fi and try again",
       "idle": " "
-    }
+    },
+    "one": "Sync",
+    "thisDeviceShort": "this device",
+    "otherShort": "other device",
+    "fxComparing": "Checking which device has newer data…",
+    "fxMoving": "Moving {{n}} items…",
+    "fxDone": "Sync complete",
+    "fxSame": "Already in sync",
+    "fxSent": "Sent {{n}} items to {{to}}",
+    "fxRecv": "Received {{n}} items from {{from}}",
+    "fxFailed": "Couldn't find the other device. Open the app on it and try again",
+    "fxTap": "Tap to close"
   }
 }

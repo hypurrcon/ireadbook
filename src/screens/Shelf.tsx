@@ -22,7 +22,7 @@ import { useSync } from '../sync/manager';
 import type { Spin } from '../three/Viewer';
 import { haptic } from '../audio/sound';
 import { loadIdentity } from '../sync/identity';
-import { StatusDot } from './Devices';
+import { StatusDot, SyncFx } from './Devices';
 
 const RoomCanvas = lazy(() => import('../three/RoomCanvas'));
 const SORTS: SortMode[] = ['status', 'genre', 'series', 'author', 'added', 'color'];
@@ -229,14 +229,19 @@ function ShelfList({ books, sortMode, seriesNames, onOpen }: { books: Book[]; so
 function SyncChip({ onOpen }: { onOpen: () => void }) {
   const { t } = useTranslation();
   const peerState = useSync((s) => s.peerState);
+  const [fx, setFx] = useState<string | null>(null);
   const peers = loadIdentity()?.peers ?? [];
   if (!peers.length) return null;
   const states = peers.map((p) => peerState[p.deviceId] ?? 'offline');
   const s = states.includes('syncing') || states.includes('connecting') ? 'syncing' : states.includes('synced') ? 'synced' : 'offline';
   return (
-    <button className="sync-chip" onClick={onOpen} aria-label={t(`sync.state.${s}`)} title={t(`sync.state.${s}`)}>
-      <StatusDot s={s} />
-    </button>
+    <>
+      <button className="sync-chip" onClick={() => (peers.length === 1 ? setFx(peers[0].deviceId) : onOpen())} aria-label={t('sync.one')} title={t(`sync.state.${s}`)}>
+        <Icon name="sync" size={20} />
+        <StatusDot s={s} />
+      </button>
+      <SyncFx peerId={fx} onClose={() => setFx(null)} />
+    </>
   );
 }
 

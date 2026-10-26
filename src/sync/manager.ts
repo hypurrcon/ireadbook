@@ -14,11 +14,13 @@ export type JoinState = 'idle' | 'connecting' | 'syncing' | 'done' | 'notFound' 
 
 interface SyncStore {
   peerState: Record<string, PeerState>;
+  /** items sent / received per device since the last reset (drives the sync animation) */
+  traffic: Record<string, { sent: number; recv: number; at: number }>;
   pairing: { code: string; expiresAt: number; state: PairState } | null;
   join: JoinState;
   lastChangeAt: number;
 }
-export const useSync = create<SyncStore>(() => ({ peerState: {}, pairing: null, join: 'idle', lastChangeAt: 0 }));
+export const useSync = create<SyncStore>(() => ({ peerState: {}, traffic: {}, pairing: null, join: 'idle', lastChangeAt: 0 }));
 
 const getHub = (): Hub => peerHub;
 
@@ -51,6 +53,14 @@ function attach(conn: Conn, knownId?: string) {
       }
     },
     onChanged: () => useSync.setState({ lastChangeAt: Date.now() }),
+    onTraffic: (sent, recv) => {
+      if (!peerId) return;
+      const id = peerId;
+      useSync.setState((st) => {
+        const cur = st.traffic[id] ?? { sent: 0, recv: 0, at: 0 };
+        return { traffic: { ...st.traffic, [id]: { sent: cur.sent + sent, recv: cur.recv + recv, at: Date.now() } } };
+      });
+    },
   });
   return s;
 }
@@ -203,4 +213,18 @@ export async function joinWithCode(input: string): Promise<JoinState> {
     });
     conn.send({ t: 'join', deviceId: me.deviceId, name: me.deviceName });
   });
+}
+
+/** One-tap sync with a single device: connect if needed, then exchange both ways. */
+export async function syncWith(deviceId: string): Promise<boolean> {
+  useSync.setState((st) => ({ traffic: { ...st.traffic, [deviceId]: { sent: 0, recv: 0, at: Date.now() } } }));
+  await ensureListening();
+  const p = loadIdentity()?.peers.find((x) => x.deviceId === deviceId);
+  if (!p) return false;
+  if (!sessions.has(deviceId)) await connectTo(p);
+  const s = sessions.get(deviceId);
+  if (!s) return false;
+  setPeer(deviceId, 'syncing');
+  s.resync();
+  return true;
 }

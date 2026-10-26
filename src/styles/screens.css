@@ -380,3 +380,21 @@
 .reading-book.paused .rb-leaf { animation-play-state: paused; }
 .mode-facedown .reading-book { display: none; }
 @media (prefers-reduced-motion: reduce) { .rb-leaf { display: none; } }
+.sync-chip { position: relative; }
+.sync-chip .sync-dot { position: absolute; right: 8px; bottom: 9px; width: 8px; height: 8px; }
+
+/* ---------- one-tap sync animation ---------- */
+.sync-fx { position: fixed; inset: 0; z-index: 95; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 24px;
+  background: radial-gradient(70% 50% at 50% 45%, color-mix(in srgb, var(--accent) 16%, var(--bg)) 0%, var(--bg) 70%); }
+.sync-stage { display: grid; grid-template-columns: 1fr minmax(120px, 1.4fr) 1fr; align-items: center; width: min(560px, 100%); gap: 8px; }
+.sync-device { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0; }
+.sync-device strong { font-size: 15px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sync-device-icon { width: 84px; height: 84px; border-radius: 26px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); color: var(--ink-soft); transition: color .3s, box-shadow .3s; }
+.sync-device.on .sync-device-icon { color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 40px -6px var(--glow); }
+.sync-wire { position: relative; height: 60px; }
+.sync-wire .wire { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); }
+.sync-wire .packet { position: absolute; top: calc(50% - 5px); width: 10px; height: 10px; margin-left: -5px; border-radius: 3px; background: var(--accent); box-shadow: 0 0 12px 3px var(--glow); }
+.sync-wire .packet.faint { opacity: .35 !important; width: 6px; height: 6px; top: calc(50% - 3px); }
+.sync-ok { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 30px var(--glow); }
+.sync-caption { text-align: center; display: flex; flex-direction: column; gap: 6px; min-height: 96px; max-width: 34ch; }
+.sync-caption strong { font-family: var(--font-display); font-size: 22px; }
