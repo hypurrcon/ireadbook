@@ -35,3 +35,12 @@ export function findIsbnInText(text: string): string | null {
   }
   return null;
 }
+
+/** ISBN-10 form of a 978- ISBN-13 (null for 979- numbers, which have none). */
+export function toIsbn10(isbn13: string): string | null {
+  if (!/^978\d{10}$/.test(isbn13)) return null;
+  const core = isbn13.slice(3, 12);
+  const sum = [...core].reduce((a, c, i) => a + Number(c) * (10 - i), 0);
+  const chk = (11 - (sum % 11)) % 11;
+  return core + (chk === 10 ? 'X' : String(chk));
+}

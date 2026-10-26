@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('add a book from real cover photos (barcode + OCR), works without the book APIs', async ({ page }) => {
+test('add a book from real cover photos (barcode), works without the book APIs', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   // the book APIs are unreachable here, like being offline
@@ -19,8 +19,8 @@ test('add a book from real cover photos (barcode + OCR), works without the book 
   await page.getByRole('button', { name: 'ดึงข้อมูลหนังสือ' }).click();
   await expect(page.getByText('ตรวจข้อมูล')).toBeVisible({ timeout: 90_000 });
   await expect(page.getByText('ตอนนี้ออฟไลน์ แอปจะเติมข้อมูลให้เมื่อมีเน็ต')).toBeVisible();
-  const title = await page.getByLabel('ชื่อเรื่อง').inputValue();
-  expect(title).toMatch(/^อาณาจ/);
+  // no guessing from the cover text any more: the title stays empty instead of being wrong
+  await expect(page.getByLabel('ชื่อเรื่อง')).toHaveValue('');
   await page.getByText('ข้อมูลเพิ่มเติม').click();
   await expect(page.getByLabel('ISBN')).toHaveValue('9786169433736');
   await page.getByLabel('ชื่อเรื่อง').fill('อาณาจักรมด');

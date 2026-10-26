@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Book, Format, Genre, ProgressUnit } from '../db/types';
 import { GENRES } from '../db/types';
-import { Field, Segmented } from './kit';
+import { Button, Field, Segmented } from './kit';
+import { lookupIsbn, searchText } from '../lookup/books';
+import { normalizeIsbn } from '../domain/isbn';
+import { sfx } from '../audio/sound';
 
 export interface BookFormValue {
   patch: Partial<Book>;
@@ -30,8 +33,10 @@ export function BookForm({ book, seriesName = '', seriesTotal, onChange, compact
   });
   const [more, setMore] = useState(!compact);
 
-  const upd = (k: keyof typeof f, v: string) => {
-    const n = { ...f, [k]: v };
+  const [auto, setAuto] = useState<'idle' | 'busy' | 'done' | 'none' | 'offline'>('idle');
+
+  const upd = (k: keyof typeof f, v: string) => emit({ ...f, [k]: v });
+  const emit = (n: typeof f) => {
     setF(n);
     onChange({
       patch: {
@@ -44,6 +49,28 @@ export function BookForm({ book, seriesName = '', seriesTotal, onChange, compact
       series: { name: n.seriesName.trim(), index: num(n.seriesIndex), total: num(n.seriesTotal) },
     });
   };
+  /** Fill every field from the ISBN (or, without one, the best title match), overwriting what is there. */
+  const runAuto = async () => {
+    setAuto('busy');
+    try {
+      const isbn = f.isbn.replace(/[^0-9Xx]/g, '');
+      const norm = isbn ? normalizeIsbn(isbn) : null;
+      let m = norm ? await lookupIsbn(norm) : null;
+      if (!m && f.title.trim()) m = (await searchText([f.title, f.authors.split(',')[0]].filter(Boolean).join(' ')))[0] ?? null;
+      if (!m) { setAuto('none'); return; }
+      emit({
+        ...f,
+        title: m.title || f.title, subtitle: m.subtitle ?? f.subtitle, authors: m.authors.length ? m.authors.join(', ') : f.authors,
+        publisher: m.publisher ?? f.publisher, isbn: m.isbn ?? norm ?? f.isbn, year: m.year ? String(m.year) : f.year,
+        pageCount: m.pageCount ? String(m.pageCount) : f.pageCount, genre: (m.genre ?? f.genre) as Genre, description: m.description ?? f.description,
+      });
+      setAuto('done');
+      sfx('reward');
+    } catch {
+      setAuto('offline');
+    }
+  };
+
   const inp = (k: keyof typeof f, opts: { numeric?: boolean; placeholder?: string } = {}) => (
     <input value={f[k]} inputMode={opts.numeric ? 'numeric' : undefined} placeholder={opts.placeholder}
       onChange={(e) => upd(k, opts.numeric ? e.target.value.replace(/\D/g, '') : e.target.value)} />
@@ -51,6 +78,10 @@ export function BookForm({ book, seriesName = '', seriesTotal, onChange, compact
 
   return (
     <div className="book-form">
+      <div className="auto-row">
+        <Button icon="refresh" size="sm" disabled={auto === 'busy'} onClick={runAuto}>{auto === 'busy' ? t('common.loading') : t('book.auto')}</Button>
+        <span className={`auto-note ${auto}`}>{t(`book.autoState.${auto}`)}</span>
+      </div>
       <Field label={t('book.fields.title')}>{inp('title')}</Field>
       <Field label={t('book.fields.authors')} hint={t('book.commaHint')}>{inp('authors')}</Field>
       <div className="row">

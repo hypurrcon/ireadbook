@@ -338,3 +338,7 @@
 .join-state { margin-top: 12px; font-size: 14px; text-align: center; color: var(--ink-soft); }
 .join-state.notFound, .join-state.error { color: var(--danger); }
 .join-state.done { color: var(--accent); }
+.auto-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.auto-note { font-size: 12.5px; color: var(--ink-soft); flex: 1; }
+.auto-note.done { color: var(--accent); }
+.auto-note.none, .auto-note.offline { color: var(--danger); }

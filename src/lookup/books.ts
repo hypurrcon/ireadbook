@@ -1,3 +1,4 @@
+import { toIsbn10 } from '../domain/isbn';
 import type { Genre } from '../db/types';
 
 export interface BookMeta {
@@ -95,6 +96,13 @@ export async function lookupIsbn(isbn: string): Promise<BookMeta | null> {
   return firstOf<BookMeta>(
     async () => {
       const g = await getJson(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+      const item = g?.items?.[0]?.volumeInfo;
+      return item?.title ? fromGoogle(item, isbn) : null;
+    },
+    async () => {
+      const ten = toIsbn10(isbn);
+      if (!ten) return null;
+      const g = await getJson(`https://www.googleapis.com/books/v1/volumes?q=isbn:${ten}`);
       const item = g?.items?.[0]?.volumeInfo;
       return item?.title ? fromGoogle(item, isbn) : null;
     },

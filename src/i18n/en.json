@@ -241,7 +241,15 @@
     "sessionDeleted": "Session deleted",
     "reviewPlaceholder": "What did you like or not like?",
     "whyReadPlaceholder": "e.g. I want to understand money better, or a friend said it's great",
-    "moreFields": "More details"
+    "moreFields": "More details",
+    "auto": "Auto",
+    "autoState": {
+      "idle": "Fill every field from the ISBN (or the title if there is no ISBN)",
+      "busy": " ",
+      "done": "Filled in. Check and save",
+      "none": "This book isn't in the book databases",
+      "offline": "Couldn't look it up. Check your internet and try again"
+    }
   },
   "time": {
     "hm": "{{h}} h {{m}} min",
@@ -342,7 +350,7 @@
     "toShelf": "Go to the shelf",
     "addedCount": "{{count}} added",
     "queued": "Saved. Guessing the details in the background",
-    "nothingFound": "No details found. You can type them in",
+    "nothingFound": "Nothing found for the barcode. Type the title and press Auto to search",
     "offlineSaved": "You're offline. Details will be filled in when you're back online",
     "workingHint": "The first time can take a while because the Thai text reader has to load",
     "step": {

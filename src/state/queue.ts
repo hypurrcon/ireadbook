@@ -2,9 +2,6 @@ import { create } from 'zustand';
 import { db } from '../db/db';
 import * as repo from '../db/repo';
 import type { Book } from '../db/types';
-import { blobToRaw } from '../image/process';
-import { ocrCover } from '../lookup/ocr';
-import { guessFromOcr } from '../lookup/guess';
 import { lookupIsbn, searchText } from '../lookup/books';
 import { resolveMeta } from '../lookup/resolve';
 import { fillEmpty } from '../domain/meta';
@@ -20,14 +17,7 @@ async function work(id: string) {
   const book = await db.books.get(id);
   if (!book) return;
   const online = navigator.onLine;
-  let guess = {};
-  if (!book.isbn || !online) {
-    const front = await repo.getImage(book.coverFrontId);
-    if (front) {
-      try { guess = guessFromOcr(await ocrCover(await blobToRaw(front)), []); } catch { /* ocr unavailable */ }
-    }
-  }
-  const r = await resolveMeta({ isbn: book.isbn, ocr: guess, online }, { lookupIsbn, searchText });
+  const r = await resolveMeta({ isbn: book.isbn, ocr: null, online }, { lookupIsbn, searchText: async () => [] });
   const fresh = await db.books.get(id);
   if (fresh) await repo.updateBook(id, fillEmpty(fresh, r.patch));
 }

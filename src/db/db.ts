@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   room: 'attic',
   rooms: {},
   quality: 'mid',
-  volume: { ui: 0.6, book: 0.8, ambience: 0.5, reward: 0.8 },
+  volume: { ui: 0.8, book: 1, ambience: 0.7, reward: 1 },
   ambienceOn: true,
   yearlyGoal: 12,
   dailyGoalMin: 5,

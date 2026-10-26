@@ -280,7 +280,7 @@ function FormCover({ processed, draft }: { processed: Processed | null; draft: P
   );
 }
 
-const STEPS: Step[] = ['straighten', 'barcode', 'lookup', 'ocr'];
+const STEPS: Step[] = ['straighten', 'barcode', 'lookup'];
 
 function Working({ step, preview }: { step: Step; preview?: string }) {
   const { t } = useTranslation();
@@ -292,7 +292,7 @@ function Working({ step, preview }: { step: Step; preview?: string }) {
       </div>
       <ul className="working-steps" aria-live="polite">
         {STEPS.map((s) => {
-          const idx = STEPS.indexOf(s), cur = STEPS.indexOf(step === 'done' ? 'ocr' : step);
+          const idx = STEPS.indexOf(s), cur = STEPS.indexOf(step === 'done' ? 'lookup' : step);
           const state = step === 'done' || idx < cur ? 'done' : idx === cur ? 'now' : 'todo';
           return (
             <li key={s} className={state}>

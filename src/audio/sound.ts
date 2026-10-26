@@ -15,7 +15,7 @@ const CATEGORY: Record<Sfx, keyof Volumes> = {
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
-let vols: Volumes = { ui: 0.6, book: 0.8, ambience: 0.5, reward: 0.8 };
+let vols: Volumes = { ui: 0.8, book: 1, ambience: 0.7, reward: 1 };
 let muted = false;
 let noiseBuf: AudioBuffer | null = null;
 
@@ -26,8 +26,16 @@ function ac(): AudioContext | null {
     if (!C) return null;
     ctx = new C();
     master = ctx.createGain();
-    master.gain.value = 0.9;
-    master.connect(ctx.destination);
+    master.gain.value = 2.4;
+    // a limiter so the louder mix never clips on phone speakers
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -8;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 8;
+    limiter.attack.value = 0.003;
+    limiter.release.value = 0.15;
+    master.connect(limiter);
+    limiter.connect(ctx.destination);
   }
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   return ctx;
@@ -38,7 +46,7 @@ export function unlockAudio() { ac(); }
 
 export function setVolumes(v: Volumes) {
   vols = v;
-  if (amb.gain && ctx) amb.gain.gain.setTargetAtTime(v.ambience * 0.5, ctx.currentTime, 0.3);
+  if (amb.gain && ctx) amb.gain.gain.setTargetAtTime(v.ambience * 0.8, ctx.currentTime, 0.3);
 }
 export function setMuted(m: boolean) { muted = m; }
 
@@ -272,7 +280,7 @@ export function playAmbience(recipe: AmbienceRecipe) {
   amb.gain = g;
   amb.key = key;
   for (const l of recipe.layers) buildLayer(c, g, l);
-  g.gain.exponentialRampToValueAtTime(Math.max(0.001, vols.ambience * 0.5), c.currentTime + 1.5);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.001, vols.ambience * 0.8), c.currentTime + 1.5);
 }
 
 export function stopAmbience() {

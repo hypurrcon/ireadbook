@@ -32,6 +32,13 @@ describe('lookup', () => {
     const m = await lookupIsbn('9786169433736');
     expect(m).toMatchObject({ title: 'อาณาจักรมด', authors: ['H.G. Wells'], year: 2020, pageCount: 120, genre: 'scifi', isbn: '9786169433736' });
   });
+  it('also asks Google by the ISBN-10 form, which some Thai books are indexed under', async () => {
+    vi.stubGlobal('fetch', vi.fn((url: string) => url.includes('isbn:6169433736')
+      ? json({ items: [{ volumeInfo: { title: 'อาณาจักรมด', authors: ['เอช.จี.เวลส์'] } }] })
+      : url.includes('googleapis') ? json({ totalItems: 0 }) : json({})));
+    const m = await lookupIsbn('9786169433736');
+    expect(m).toMatchObject({ title: 'อาณาจักรมด', isbn: '9786169433736' });
+  });
   it('falls back to Open Library when Google misses', async () => {
     vi.stubGlobal('fetch', vi.fn((url: string) => url.includes('googleapis')
       ? json({ totalItems: 0 })

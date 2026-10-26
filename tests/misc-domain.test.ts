@@ -124,3 +124,12 @@ describe('shelfCapacity', () => {
   });
   it('caps at the physical maximum for big libraries', () => { expect(shelfCapacity(300, 4)).toBe(22); });
 });
+
+import { toIsbn10 } from '../src/domain/isbn';
+describe('toIsbn10', () => {
+  it('converts 978 numbers and refuses 979', () => {
+    expect(toIsbn10('9786169433736')).toBe('6169433736');
+    expect(toIsbn10('9780306406157')).toBe('0306406152');
+    expect(toIsbn10('9791234567896')).toBeNull();
+  });
+});
