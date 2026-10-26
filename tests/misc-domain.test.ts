@@ -133,3 +133,14 @@ describe('toIsbn10', () => {
     expect(toIsbn10('9791234567896')).toBeNull();
   });
 });
+
+import { effectiveRows } from '../src/domain/layout';
+describe('effectiveRows', () => {
+  it('uses fewer, fuller shelves for a small library and the chosen count once it grows', () => {
+    expect(effectiveRows(3, 4)).toBe(2);
+    expect(effectiveRows(16, 4)).toBe(2);
+    expect(effectiveRows(25, 4)).toBe(3);
+    expect(effectiveRows(200, 4)).toBe(4);
+    expect(effectiveRows(200, 6)).toBe(6);
+  });
+});

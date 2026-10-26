@@ -57,12 +57,23 @@ function attach(conn: Conn, knownId?: string) {
 
 const nameOf = (id: string) => loadIdentity()?.peers.find((p) => p.deviceId === id)?.name ?? '';
 
+let retryTimer: ReturnType<typeof setTimeout> | undefined;
+let retries = 0;
+
 async function ensureListening() {
   if (stopListening) return;
   const me = ensureIdentity();
   try {
     stopListening = await getHub().listen(devicePeerId(me.deviceId), (c) => attach(c));
-  } catch { stopListening = null; }
+    retries = 0;
+  } catch {
+    stopListening = null;
+    // after a reload the finder service still holds our old id for a while: try again soon
+    if (retries < 30 && !retryTimer) {
+      retries++;
+      retryTimer = setTimeout(() => { retryTimer = undefined; connectAll(); }, 4000);
+    }
+  }
 }
 
 async function connectTo(p: PeerInfo) {
@@ -81,6 +92,7 @@ export async function connectAll() {
   const me = loadIdentity();
   if (!me?.peers.length) return;
   await ensureListening();
+  if (!stopListening) return;
   await Promise.all(me.peers.map(connectTo));
 }
 

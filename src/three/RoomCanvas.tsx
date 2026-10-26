@@ -3,9 +3,10 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three';
 import { useTranslation } from 'react-i18next';
 import type { Book, Quality, RoomCustomization } from '../db/types';
-import { layoutShelves, shelfCapacity, type SortMode } from '../domain/layout';
+import { layoutShelves, shelfCapacity, effectiveRows, type SortMode } from '../domain/layout';
 import { Bookcase, caseHeight, CASE_W, CASE_D } from './Bookcase';
 import { Book3D, bookDims } from './Book3D';
+import { Viewer, type Spin } from './Viewer';
 import { getRoom, defaultCustomization } from '../rooms/registry';
 import { ensureFonts } from './textures';
 import { sfx, haptic } from '../audio/sound';
@@ -24,6 +25,9 @@ interface Props {
   onPick: (b: Book | null) => void;
   highlightIds?: Set<string> | null;
   onCasesChange?: (n: number, index: number) => void;
+  /** book ids in shelf order, for browsing next / previous in the viewer */
+  onOrder?: (ids: string[]) => void;
+  spin: React.MutableRefObject<Spin>;
 }
 
 function CameraRig({ caseIndex, caseH, picked, fov, yBias, zoom }: { caseIndex: number; caseH: number; picked: THREE.Vector3 | null; fov: number; yBias: number; zoom: number }) {
@@ -61,17 +65,17 @@ function FaceOut({ books, x, y, untitled, pickedId, onPick, shadows }: { books: 
       {shown.map((b, i) => {
         const d = bookDims(b);
         const px = x + (i - (shown.length - 1) / 2) * span;
-        return <Book3D key={b.id} book={b} untitled={untitled} faceOut position={[px, y, -CASE_D / 2 + d.t / 2 + 0.03]} picked={pickedId === b.id} onPick={onPick} castShadow={shadows} />;
+        return <Book3D key={b.id} book={b} untitled={untitled} faceOut position={[px, y, -CASE_D / 2 + d.t / 2 + 0.03]} hidden={pickedId === b.id} onPick={onPick} castShadow={shadows} />;
       })}
     </>
   );
 }
 
-export default function RoomCanvas({ roomId, books, sortMode, quality, custom, seriesNames, pickedId, onPick, highlightIds, onCasesChange }: Props) {
+export default function RoomCanvas({ roomId, books, sortMode, quality, custom, seriesNames, pickedId, onPick, highlightIds, onCasesChange, onOrder, spin }: Props) {
   const { t } = useTranslation();
   const room = getRoom(roomId);
   const cust = { ...defaultCustomization(room), ...(custom ?? {}) };
-  const rows = Math.max(2, Math.min(6, cust.shelfRows));
+  const rows = effectiveRows(books.length, Math.max(2, Math.min(6, cust.shelfRows)));
   const caseH = caseHeight(rows);
   const reading = useMemo(() => books.filter((b) => b.status === 'reading').sort((a, b) => b.updatedAt - a.updatedAt), [books]);
   const onShelf = useMemo(() => books.filter((b) => !reading.slice(0, 3).some((r) => r.id === b.id)), [books, reading]);
@@ -88,6 +92,16 @@ export default function RoomCanvas({ roomId, books, sortMode, quality, custom, s
   useEffect(() => { if (caseIndex >= cases.length) setCaseIndex(Math.max(0, cases.length - 1)); }, [cases.length, caseIndex]);
   useEffect(() => { onCasesChange?.(cases.length, caseIndex); }, [cases.length, caseIndex, onCasesChange]);
   useEffect(() => { if (!pickedId) setPickedPos(null); }, [pickedId]);
+  useEffect(() => {
+    onOrder?.([...reading.slice(0, 3).map((b) => b.id), ...cases.flatMap((c) => c.shelves.flatMap((s) => s.books.map((b) => b.id)))]);
+  }, [cases, reading, onOrder]);
+  const pickedBook = pickedId ? books.find((b) => b.id === pickedId) ?? null : null;
+  // keep the bookcase that holds the picked book in view
+  useEffect(() => {
+    if (!pickedId) return;
+    const i = cases.findIndex((c) => c.shelves.some((s) => s.books.some((b) => b.id === pickedId)));
+    if (i >= 0 && i !== caseIndex) setCaseIndex(i);
+  }, [pickedId]);
 
   const labelFor = (key: string) => {
     if (sortMode === 'genre') return t(`genre.${key}`);
@@ -140,7 +154,8 @@ export default function RoomCanvas({ roomId, books, sortMode, quality, custom, s
               readingIds={readingIds} untitled={t('common.untitled')} labelFor={labelFor} onPick={handlePick} shadows={shadows} dimIds={highlightIds} />
           ))}
           {room.faceOut !== false && <FaceOut books={reading} x={0} y={caseH} untitled={t('common.untitled')} pickedId={pickedId} onPick={handlePick} shadows={shadows} />}
-          <CameraRig caseIndex={caseIndex} caseH={caseH} picked={pickedId ? pickedPos : null} fov={room.camera?.fov ?? 38} yBias={room.camera?.yBias ?? 0} zoom={room.camera?.zoom ?? 1} />
+          <Viewer book={pickedBook} spin={spin} untitled={t('common.untitled')} />
+          <CameraRig caseIndex={caseIndex} caseH={caseH} picked={null} fov={room.camera?.fov ?? 38} yBias={room.camera?.yBias ?? 0} zoom={room.camera?.zoom ?? 1} />
         </Suspense>
       </Canvas>
       {cases.length > 1 && (

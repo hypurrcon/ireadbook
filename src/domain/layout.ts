@@ -75,3 +75,8 @@ export function layoutShelves(books: Book[], mode: SortMode, perShelf: number, s
 export function shelfCapacity(n: number, rows: number, max = 22, min = 6): number {
   return Math.max(min, Math.min(max, Math.ceil(n / Math.max(1, rows))));
 }
+
+/** Shelves to show in a bookcase: a small library gets fewer, fuller shelves (about 9 books each). */
+export function effectiveRows(n: number, maxRows: number): number {
+  return Math.max(2, Math.min(maxRows, Math.ceil(n / 9)));
+}

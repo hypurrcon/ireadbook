@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import type { Book } from '../db/types';
 import type { Shelf } from '../domain/layout';
 import { Book3D, bookDims } from './Book3D';
+import { arrangeRow } from '../domain/arrange';
 import { labelTexture, proceduralTexture, rng } from './textures';
 import type { ThreeEvent } from '@react-three/fiber';
 
@@ -145,32 +146,33 @@ export function Bookcase({ x, shelves, rows, look, pickedId, readingIds, untitle
     if (row < 0) return;
     const yBase = 0.06 + row * ROW_H;
     const dims = shelf.books.map(bookDims);
-    const total = dims.reduce((a, d) => a + d.t + 0.0025, 0);
-    const squeeze = total > inner ? inner / total : 1;
-    let cx = -inner / 2;
+    const { placed, bookendX } = arrangeRow(shelf.books.map((b, i) => ({ id: b.id, t: dims[i].t, h: dims[i].h, d: dims[i].d })), inner, `${x}:${si}:${shelf.books.length}`);
+    const byId = new Map(placed.map((p) => [p.id, p]));
     let labelEnd = -Infinity;
     shelf.books.forEach((b, bi) => {
       const d = dims[bi];
-      const t = d.t * squeeze;
-      const seg = shelf.segments.find((s) => s.start === bi);
+      const p = byId.get(b.id)!;
+      const left = -inner / 2 + p.x - (p.t ?? d.t) / 2;
+      const seg = shelf.segments.find((sg) => sg.start === bi);
       if (seg && seg.label) {
         const text = labelFor(seg.label);
         const w = labelWidth(text, look);
-        if (cx >= labelEnd + 0.004) {
-          labels.push(<Label key={`lab${si}-${bi}`} text={text} x={cx} y={yBase - BOARD / 2} z={CASE_D / 2 + 0.002} look={look} />);
-          labelEnd = cx + w;
+        if (left >= labelEnd + 0.004) {
+          labels.push(<Label key={`lab${si}-${bi}`} text={text} x={left} y={yBase - BOARD / 2} z={CASE_D / 2 + 0.002} look={look} />);
+          labelEnd = left + w;
         } else {
-          // no room for the name: a small divider tab still marks where the group starts
-          labels.push(<mesh key={`tab${si}-${bi}`} position={[cx - 0.0012, yBase - BOARD / 2, CASE_D / 2 + 0.002]}><planeGeometry args={[0.004, BOARD * 0.8]} /><meshBasicMaterial color={look.labelInk} toneMapped={false} /></mesh>);
+          labels.push(<mesh key={`tab${si}-${bi}`} position={[left - 0.0012, yBase - BOARD / 2, CASE_D / 2 + 0.002]}><planeGeometry args={[0.004, BOARD * 0.8]} /><meshBasicMaterial color={look.labelInk} toneMapped={false} /></mesh>);
         }
       }
       books.push(
-        <Book3D key={b.id} book={b} untitled={untitled} position={[x + cx + t / 2, yBase, CASE_D / 2 - d.d / 2 - 0.012]}
-          picked={pickedId === b.id} onPick={onPick} castShadow={shadows} dimmed={!!dimIds && !dimIds.has(b.id)}
-          glow={readingIds.has(b.id) ? look.ledColor ?? '#ffcf7a' : undefined} />,
+        <Book3D key={b.id} book={b} untitled={untitled} position={[x - inner / 2 + p.x, yBase, CASE_D / 2 - d.d / 2 - 0.012 - p.inset]}
+          pose={{ y: p.y, rotZ: p.rotZ, t: p.t }} hidden={pickedId === b.id} onPick={onPick} castShadow={shadows}
+          dimmed={!!dimIds && !dimIds.has(b.id)} glow={readingIds.has(b.id) ? look.ledColor ?? '#ffcf7a' : undefined} />,
       );
-      cx += t + 0.0025 * squeeze;
     });
+    if (bookendX !== undefined) {
+      books.push(<Bookend key={`end${si}`} x={x - inner / 2 + bookendX} y={yBase} z={CASE_D / 2 - 0.08} metal={look.material === 'metal' || look.style === 'metal'} />);
+    }
   });
 
   return (
@@ -182,5 +184,16 @@ export function Bookcase({ x, shelves, rows, look, pickedId, readingIds, untitle
       </group>
       {books}
     </>
+  );
+}
+
+/** An L-shaped bookend holding the row upright. */
+function Bookend({ x, y, z, metal }: { x: number; y: number; z: number; metal: boolean }) {
+  const mat = useMemo(() => new THREE.MeshStandardMaterial({ color: metal ? '#9aa3ad' : '#2b2622', roughness: metal ? 0.3 : 0.5, metalness: metal ? 0.8 : 0.1 }), [metal]);
+  return (
+    <group position={[x, y, z]}>
+      <mesh geometry={box} material={mat} position={[0.004, 0.075, 0]} scale={[0.006, 0.15, 0.1]} castShadow />
+      <mesh geometry={box} material={mat} position={[-0.03, 0.002, 0]} scale={[0.07, 0.004, 0.1]} />
+    </group>
   );
 }

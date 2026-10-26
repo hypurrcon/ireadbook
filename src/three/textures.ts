@@ -63,7 +63,7 @@ function truncate(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
 
 /** Spine: drawn sideways (title reads top→bottom as on real Thai/English spines). */
 export function spineTexture(b: Book, untitled: string): THREE.Texture {
-  const key = `spine:${b.id}:${b.updatedAt}`;
+  const key = `spine:${b.id}:${b.updatedAt}:${b.status}:${b.rereadCount}`;
   const hit = canvasCache.get(key);
   if (hit) return hit;
   const W = 96, H = 768;
@@ -84,12 +84,22 @@ export function spineTexture(b: Book, untitled: string): THREE.Texture {
     ctx.fillStyle = `rgba(${Math.random() < 0.5 ? '0,0,0' : '255,255,255'},${Math.random() * 0.05})`;
     ctx.fillRect(Math.random() * W, Math.random() * H, 1, 2 + Math.random() * 4);
   }
+  const rereads = b.status === 'finished' ? Math.min(5, b.rereadCount) : 0;
   // head/tail bands
   ctx.fillStyle = ink;
   ctx.globalAlpha = 0.55;
   ctx.fillRect(10, 34, W - 20, 2);
   ctx.fillRect(10, H - 38, W - 20, 2);
   ctx.globalAlpha = 1;
+  if (b.status === 'finished') {
+    // gold foil: a wide band at the head and the foot, and one dot per extra reading
+    const gold = ctx.createLinearGradient(0, 0, W, 0);
+    gold.addColorStop(0, '#8a6a1f'); gold.addColorStop(0.35, '#f5d77a'); gold.addColorStop(0.6, '#c99a2e'); gold.addColorStop(1, '#7a5a17');
+    ctx.fillStyle = gold;
+    ctx.fillRect(0, 10, W, 16);
+    ctx.fillRect(0, H - 26, W, 16);
+    for (let i = 0; i < rereads; i++) ctx.fillRect(0, H - 38 - i * 10, W, 5);
+  }
   // title
   ctx.save();
   ctx.translate(W / 2 + 2, 60);
@@ -105,7 +115,7 @@ export function spineTexture(b: Book, untitled: string): THREE.Texture {
   // author (small, near the bottom)
   if (b.authors[0]) {
     ctx.save();
-    ctx.translate(W / 2, H - 60);
+    ctx.translate(W / 2, H - 60 - rereads * 10);
     ctx.rotate(Math.PI / 2);
     ctx.fillStyle = ink;
     ctx.globalAlpha = 0.8;

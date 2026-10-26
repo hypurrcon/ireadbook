@@ -168,7 +168,10 @@
     "pageOf": "Page {{page}}/{{total}}",
     "percent": "{{p}}%",
     "noResults": "No books match your search",
-    "reviewWaiting": "{{count}} books waiting for review"
+    "reviewWaiting": "{{count}} books waiting for review",
+    "prevBook": "Previous book",
+    "nextBook": "Next book",
+    "spinHint": "Drag to spin · swipe the card to change book · tap empty space to close"
   },
   "book": {
     "status": "Status",

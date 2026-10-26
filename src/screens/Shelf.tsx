@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState, useCallback } from 'react';
+import { lazy, Suspense, useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -19,6 +19,8 @@ import { exportBackup, backupFileName } from '../backup/backup';
 import { downloadBlob } from '../share/actions';
 import { toast } from '../ui/kit';
 import { useSync } from '../sync/manager';
+import type { Spin } from '../three/Viewer';
+import { haptic } from '../audio/sound';
 import { loadIdentity } from '../sync/identity';
 import { StatusDot } from './Devices';
 
@@ -56,6 +58,29 @@ export default function Shelf() {
   const pickedLive = picked ? list.find((b) => b.id === picked.id) ?? null : null;
 
   const onPick = useCallback((b: Book | null) => setPicked(b), []);
+  const spin = useRef<Spin>({ angle: 0, vel: 0, dragging: false, dir: 0 });
+  const [order, setOrder] = useState<string[]>([]);
+  const onOrder = useCallback((ids: string[]) => setOrder(ids), []);
+  const step = useCallback((d: number) => {
+    if (!picked) return;
+    const ids = settings.viewMode === '3d' ? order : list.map((b) => b.id);
+    const i = ids.indexOf(picked.id);
+    const next = list.find((b) => b.id === ids[(i + d + ids.length) % ids.length]);
+    if (!next || next.id === picked.id) return;
+    spin.current.dir = d;
+    sfx('bookOut'); haptic(8);
+    setPicked(next);
+  }, [picked, order, list, settings.viewMode]);
+  useEffect(() => {
+    if (!picked) return;
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') step(1);
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'Escape') { sfx('bookIn'); setPicked(null); }
+    };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [picked, step]);
   const random = () => {
     const b = pickRandom(list);
     if (b) { sfx('bookOut'); setPicked(b); }
@@ -75,7 +100,7 @@ export default function Shelf() {
       {settings.viewMode === '3d' ? (
         <Suspense fallback={<div className="room-loading" />}>
           <RoomCanvas roomId={settings.room} books={list} sortMode={settings.sortMode} quality={settings.quality}
-            custom={settings.rooms[settings.room]} seriesNames={seriesNames} pickedId={pickedLive?.id ?? null} onPick={onPick} highlightIds={filtered} />
+            custom={settings.rooms[settings.room]} seriesNames={seriesNames} pickedId={pickedLive?.id ?? null} onPick={onPick} highlightIds={filtered} onOrder={onOrder} spin={spin} />
         </Suspense>
       ) : (
         <ShelfList books={list.filter((b) => !filtered || filtered.has(b.id))} sortMode={settings.sortMode} seriesNames={seriesNames} onOpen={(b) => nav(`/book/${b.id}`)} />
@@ -111,10 +136,14 @@ export default function Shelf() {
         <button className="review-chip" onClick={() => nav('/review')}>{t('shelf.reviewWaiting', { count: review })}<Icon name="forward" size={14} /></button>
       )}
 
+      {pickedLive && settings.viewMode === '3d' && <ViewerLayer spin={spin} onStep={step} onClose={() => { sfx('bookIn'); setPicked(null); }} />}
+
       <div className="shelf-bottom">
         <AnimatePresence mode="wait">
           {pickedLive ? (
-            <motion.div key={'p' + pickedLive.id} className="now-card stack" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={spring}>
+            <motion.div key={'p' + pickedLive.id} className="now-card stack" initial={{ x: spin.current.dir * 60, opacity: 0 }} animate={{ x: 0, y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={spring}
+              drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.5}
+              onDragEnd={(_, info) => { if (info.offset.x < -70 || info.velocity.x < -500) step(1); else if (info.offset.x > 70 || info.velocity.x > 500) step(-1); }}>
               <BookLine book={pickedLive} />
               <div className="now-actions">
                 <Button variant="quiet" onClick={() => nav(`/book/${pickedLive.id}`)}>{t('shelf.details')}</Button>
@@ -208,5 +237,32 @@ function SyncChip({ onOpen }: { onOpen: () => void }) {
     <button className="sync-chip" onClick={onOpen} aria-label={t(`sync.state.${s}`)} title={t(`sync.state.${s}`)}>
       <StatusDot s={s} />
     </button>
+  );
+}
+
+/** Drag anywhere to spin the picked book; arrows browse the shelf. */
+function ViewerLayer({ spin, onStep, onClose }: { spin: React.MutableRefObject<Spin>; onStep: (d: number) => void; onClose: () => void }) {
+  const { t } = useTranslation();
+  const last = useRef<{ x: number; t: number; moved: number } | null>(null);
+  return (
+    <div className="viewer-layer"
+      onPointerDown={(e) => { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); last.current = { x: e.clientX, t: performance.now(), moved: 0 }; spin.current.dragging = true; spin.current.touched = true; spin.current.vel = 0; }}
+      onPointerMove={(e) => {
+        const l = last.current;
+        if (!l) return;
+        const now = performance.now();
+        const dx = e.clientX - l.x;
+        const da = dx * 0.011;
+        spin.current.angle += da;
+        spin.current.vel = da / Math.max(0.008, (now - l.t) / 1000);
+        l.moved += Math.abs(dx);
+        l.x = e.clientX; l.t = now;
+      }}
+      onPointerUp={() => { const l = last.current; last.current = null; spin.current.dragging = false; if (l && l.moved < 6) onClose(); }}
+      onPointerCancel={() => { last.current = null; spin.current.dragging = false; }}>
+      <button className="viewer-arrow left" aria-label={t('shelf.prevBook')} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onStep(-1); }}><Icon name="back" /></button>
+      <button className="viewer-arrow right" aria-label={t('shelf.nextBook')} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onStep(1); }}><Icon name="forward" /></button>
+      <span className="viewer-hint">{t('shelf.spinHint')}</span>
+    </div>
   );
 }

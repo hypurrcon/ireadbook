@@ -342,3 +342,11 @@
 .auto-note { font-size: 12.5px; color: var(--ink-soft); flex: 1; }
 .auto-note.done { color: var(--accent); }
 .auto-note.none, .auto-note.offline { color: var(--danger); }
+
+/* ---------- book viewer on the shelf ---------- */
+.viewer-layer { position: absolute; left: 0; right: 0; top: calc(70px + var(--safe-t)); bottom: calc(var(--tabbar-h) + var(--safe-b) + 150px); z-index: 4; touch-action: none; cursor: grab; }
+.viewer-layer:active { cursor: grabbing; }
+.viewer-arrow { position: absolute; top: 50%; width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: color-mix(in srgb, var(--bg) 65%, transparent); border: 1px solid var(--line); }
+.viewer-arrow.left { left: 10px; }
+.viewer-arrow.right { right: 10px; }
+.viewer-hint { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-size: 12px; color: var(--ink-soft); pointer-events: none; }
