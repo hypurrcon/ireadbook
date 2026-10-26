@@ -6,7 +6,7 @@ import { lookupIsbn, searchText, mapCategories } from '../src/lookup/books';
 import { guessFromOcr } from '../src/lookup/guess';
 
 const require = createRequire(import.meta.url);
-const sharp = require('/home/claude/.npm-global/lib/node_modules/sharp');
+const sharp = require('sharp');
 
 afterEach(() => vi.unstubAllGlobals());
 

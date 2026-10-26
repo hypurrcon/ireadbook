@@ -5,7 +5,7 @@ import { solveHomography, applyHomography } from '../src/image/homography';
 import { warpRaw, guessCornersRaw, dominantColorRaw, type Raw } from '../src/image/raw';
 
 const require = createRequire(import.meta.url);
-const sharp = require('/home/claude/.npm-global/lib/node_modules/sharp');
+const sharp = require('sharp');
 
 async function load(path: string): Promise<Raw> {
   const { data, info } = await sharp(path).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
