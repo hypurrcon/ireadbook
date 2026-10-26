@@ -11,6 +11,7 @@ import { useTimer, type Draft } from '../state/timer';
 import { Button, Field, IconButton, Sheet, spring, toast } from '../ui/kit';
 import { Icon } from '../ui/Icon';
 import { Cover } from '../ui/Cover';
+import { ReadingBook } from '../ui/ReadingBook';
 import { displayTitle, formatMinutes, startReading } from '../state/actions';
 import { pomodoroState } from '../domain/pomodoro';
 import { computeStreak } from '../domain/streak';
@@ -114,6 +115,7 @@ function Running({ onDone, onSaving }: { onDone: (r: Result) => void; onSaving: 
       </div>
 
       <div className="session-center">
+        <ReadingBook book={book} running={!paused && pomo?.phase !== 'break'} untitled={t('common.untitled')} />
         <p className="session-sub">{sub}</p>
         <motion.p key={pomo?.phase ?? 'x'} className="session-time" initial={{ scale: 0.96, opacity: 0.6 }} animate={{ scale: 1, opacity: paused ? 0.45 : 1 }} transition={spring}>
           {bigText}
