@@ -1,0 +1,722 @@
+{
+  "app": {
+    "name": "Ireadbook"
+  },
+  "tabs": {
+    "shelf": "Shelf",
+    "read": "Read",
+    "add": "Add",
+    "stats": "Stats",
+    "assistant": "Assistant"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "done": "Done",
+    "confirm": "Confirm",
+    "untitled": "Untitled",
+    "minutes": "{{count}} min",
+    "pages": "{{count}} pages",
+    "books": "{{count}} books",
+    "days": "{{count}} days",
+    "search": "Search",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "saveImage": "Save image",
+    "retry": "Retry",
+    "loading": "Loading",
+    "optional": "optional",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "status": {
+    "want": "Want to read",
+    "reading": "Reading",
+    "paused": "Paused",
+    "finished": "Finished",
+    "dnf": "Stopped"
+  },
+  "format": {
+    "paperback": "Paperback",
+    "hardcover": "Hardcover",
+    "ebook": "Ebook",
+    "audiobook": "Audiobook"
+  },
+  "genre": {
+    "fiction": "Fiction",
+    "fantasy": "Fantasy",
+    "scifi": "Sci-fi",
+    "mystery": "Mystery",
+    "romance": "Romance",
+    "horror": "Horror",
+    "history": "History",
+    "biography": "Biography",
+    "selfhelp": "Self-help",
+    "business": "Business",
+    "psychology": "Psychology",
+    "philosophy": "Philosophy",
+    "science": "Science",
+    "comics": "Comics",
+    "poetry": "Poetry",
+    "children": "Children",
+    "other": "Other"
+  },
+  "rooms": {
+    "attic": {
+      "name": "Rainy attic",
+      "desc": "Sloped roof, round window, a yellow lamp, rain on the tiles"
+    },
+    "cyberpunk": {
+      "name": "Neon city flat",
+      "desc": "Steel shelves with LED strips, hologram signs, rain over the skyline"
+    },
+    "library": {
+      "name": "Old library",
+      "desc": "Floor-to-ceiling shelves, a rolling ladder, candlelight"
+    },
+    "japanese": {
+      "name": "Japanese house",
+      "desc": "Low wooden shelves, shoji doors, cherry petals in the garden"
+    },
+    "treehouse": {
+      "name": "Treehouse",
+      "desc": "Branch shelves, fireflies at night, birds and leaves"
+    },
+    "space": {
+      "name": "Space station",
+      "desc": "Books held by straps, Earth through the window"
+    },
+    "wizard": {
+      "name": "Wizard tower",
+      "desc": "Curved shelves along a round tower, floating books, glowing potions"
+    },
+    "train": {
+      "name": "Night train cabin",
+      "desc": "A small shelf above the bunk, city lights sliding past"
+    },
+    "underwater": {
+      "name": "Undersea room",
+      "desc": "Curved glass window, passing fish, rippling light"
+    },
+    "cafe": {
+      "name": "Corner café",
+      "desc": "A shelf by the counter, an espresso machine, people walking past"
+    },
+    "minimal": {
+      "name": "Minimal studio",
+      "desc": "Bright white room, sun through curtains, lightest on devices"
+    }
+  },
+  "welcome": {
+    "tagline": "Read the real books you own, a little every day",
+    "pickLang": "Choose a language",
+    "pickRoom": "Choose a room for your shelf",
+    "pickRoomHint": "You can change it any time in Settings",
+    "firstBook": "Your first book",
+    "firstBookHint": "The one you most want to read right now. Add the rest later.",
+    "takePhoto": "Photograph the cover",
+    "typeTitle": "or type the title",
+    "titlePlaceholder": "Book title",
+    "pagesPlaceholder": "Pages",
+    "addBook": "Add this book",
+    "added": "Added \"{{title}}\"",
+    "goal": "How long do you want to read each day?",
+    "goalHint": "A day counts as a reading day when you reach this. Starting small works best.",
+    "ready": "All set",
+    "readyBody": "Try 5 minutes now? You can stop any time.",
+    "start5": "Read for 5 minutes",
+    "toShelf": "Go to my shelf",
+    "readyNoBook": "Add your first book with the + button, then start reading.",
+    "restore": "Moving from another device? Import a backup"
+  },
+  "shelf": {
+    "todayDone": "Today's reading done",
+    "todayLeft": "Today {{done}}/{{goal}} min",
+    "streak": "{{count}}-day streak",
+    "continue": "Continue",
+    "start": "Start reading",
+    "details": "Details",
+    "pickNext": "Nothing in progress",
+    "pickNextBody": "Tap a book on the shelf, or let the app pick one",
+    "randomPick": "Pick one for me",
+    "emptyTitle": "Your shelf is empty",
+    "emptyBody": "Add the books you own and watch the shelf fill up",
+    "addFirst": "Add a book",
+    "sortBy": "Sort by",
+    "sort": {
+      "genre": "Genre",
+      "series": "Series",
+      "author": "Author",
+      "status": "Status",
+      "added": "Recently added",
+      "color": "Cover colour"
+    },
+    "filter": "Show",
+    "all": "All",
+    "searchPlaceholder": "Search title or author",
+    "view3d": "3D room",
+    "view2d": "List",
+    "settings": "Settings",
+    "pageOf": "Page {{page}}/{{total}}",
+    "percent": "{{p}}%",
+    "noResults": "No books match your search",
+    "reviewWaiting": "{{count}} books waiting for review"
+  },
+  "book": {
+    "status": "Status",
+    "progress": "Progress",
+    "eta": "About {{time}} left to finish",
+    "etaUnknown": "Read a little and the app will estimate the time left",
+    "sessions": "Reading sessions",
+    "noSessions": "No sessions yet",
+    "edit": "Edit details",
+    "delete": "Delete this book",
+    "deleteConfirm": "Delete \"{{title}}\" and all its reading sessions? This can't be undone.",
+    "deleted": "Book deleted",
+    "whyRead": "Why I want to read it",
+    "series": "Series",
+    "seriesOf": "Book {{index}} of {{name}}",
+    "seriesProgress": "{{read}}/{{total}} read",
+    "seriesMissing": "Missing book {{list}}",
+    "seriesSuggest": "This looks like book {{index}} of \"{{name}}\"",
+    "seriesConfirm": "Yes, add to series",
+    "seriesNo": "No",
+    "seriesSkipWarn": "You haven't read book {{index}} before this one",
+    "fields": {
+      "title": "Title",
+      "originalTitle": "Original title",
+      "subtitle": "Subtitle",
+      "authors": "Authors",
+      "translators": "Translators",
+      "publisher": "Publisher",
+      "isbn": "ISBN",
+      "year": "Year",
+      "pageCount": "Pages",
+      "format": "Format",
+      "genre": "Main genre",
+      "tags": "Tags",
+      "seriesName": "Series name",
+      "seriesIndex": "Book number",
+      "seriesTotal": "Books in series",
+      "whyRead": "Why I want to read it",
+      "recommendedBy": "Recommended by",
+      "rating": "Rating",
+      "review": "Review",
+      "progressUnit": "Track progress in",
+      "description": "Summary"
+    },
+    "commaHint": "Separate names with commas",
+    "unitPage": "Pages",
+    "unitPercent": "Percent",
+    "readAgain": "Read again",
+    "rereads": "Read {{count}} more times",
+    "editSession": "Edit session",
+    "deleteSession": "Delete session",
+    "minutesRead": "Minutes read",
+    "endAt": "Stopped at page",
+    "endAtPercent": "Stopped at (%)",
+    "note": "Note",
+    "quotes": "Quotes",
+    "needsLookup": "Will look up details when online",
+    "findInfo": "Look up details again",
+    "notFound": "No extra details found",
+    "missing": "This book could not be found",
+    "finishedToast": "Another book finished",
+    "seriesSaved": "Added to the series \"{{name}}\"",
+    "infoUpdated": "Details filled in",
+    "offline": "You are offline. Try again when connected",
+    "flip": "Flip to see the back cover",
+    "translatedBy": "translated by {{names}}",
+    "pageOnly": "Page {{page}}",
+    "info": "Book details",
+    "saved": "Saved",
+    "sessionDeleted": "Session deleted",
+    "reviewPlaceholder": "What did you like or not like?",
+    "whyReadPlaceholder": "e.g. I want to understand money better, or a friend said it's great",
+    "moreFields": "More details"
+  },
+  "time": {
+    "hm": "{{h}} h {{m}} min",
+    "h": "{{h}} h",
+    "m": "{{m}} min",
+    "lessThanMin": "under a minute",
+    "minUnit": "min"
+  },
+  "read": {
+    "just5": "Just 5 minutes",
+    "pagesRange": "p. {{from}} → {{to}}",
+    "todayDone": "Today's reading is done",
+    "todayLeft": "{{left}} min left for today",
+    "todayOf": "{{done}} of {{goal}} min read",
+    "inProgress": "Timer running",
+    "noBookTitle": "No book to read yet",
+    "noBookBody": "Add a book you own first, then start reading here",
+    "continueWith": "Continue",
+    "startWith": "Up next",
+    "otherBook": "Change book",
+    "lastTime": "{{when}}",
+    "lastPage": "you reached page {{page}}",
+    "lastPercent": "you reached {{p}}%",
+    "firstTime": "You haven't opened this one yet. A page or two is enough to start.",
+    "startTimer": "Start the timer",
+    "mode": {
+      "5min": "Just 5 min",
+      "pomodoro": "Pomodoro",
+      "facedown": "Phone down"
+    },
+    "modeHint": {
+      "5min": "The easiest start",
+      "pomodoro": "{{work}}/{{rest}} min",
+      "facedown": "Pick it up to stop"
+    },
+    "logPast": "Log past reading",
+    "book": "Book",
+    "date": "Date",
+    "startTime": "Started at",
+    "nowAt": "Now on page {{page}}",
+    "notePlaceholder": "What did you get from this session? One line is enough",
+    "logged": "Logged {{min}} min",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago"
+  },
+  "quote": {
+    "add": "Save a quote",
+    "empty": "No quotes yet. When a line stands out, photograph the page to keep it.",
+    "page": "p. {{page}}",
+    "fromPhoto": "Photograph the page",
+    "photoHint": "The app reads the text from the photo. Delete everything except the line you like.",
+    "reading": "Reading text from the photo…",
+    "text": "Text",
+    "textPlaceholder": "Type or paste the line you like",
+    "pageLabel": "Page",
+    "saved": "Quote saved",
+    "ocrEmpty": "Couldn't read text from the photo. Try a sharper photo or type it in.",
+    "ocrFail": "Reading the photo failed. Please try again."
+  },
+  "share": {
+    "locale": "en-GB",
+    "minutes": "minutes",
+    "pages": "pages",
+    "streakDays": "day streak",
+    "readToday": "Read today",
+    "finished": "Finished",
+    "daysToFinish": "days to finish",
+    "hours": "hours read",
+    "booksFinished": "books finished",
+    "daysRead": "days read",
+    "topGenre": "Most read genre",
+    "saved": "Image saved",
+    "card": "Share card"
+  },
+  "add": {
+    "title": "Add a book",
+    "photoFront": "Photograph the front cover",
+    "photoFrontHint": "Lay the book flat and fit the whole cover in the photo",
+    "continuous": "Add several in a row",
+    "continuousHint": "Shoot the next book right away. Details are guessed in the background for you to check later.",
+    "fromLibrary": "Choose a photo",
+    "searchOrType": "Search or type",
+    "adjustFront": "Adjust the front corners",
+    "adjustBack": "Adjust the back corners",
+    "adjustHint": "Drag the 4 points onto the cover corners and the photo is straightened",
+    "wholePhoto": "Use whole photo",
+    "photoBack": "Photograph the back cover",
+    "photoBackHint": "Include the ISBN barcode for the most accurate details",
+    "skipBack": "Skip the back cover",
+    "analyze": "Get book details",
+    "check": "Check the details",
+    "save": "Put it on the shelf",
+    "savedTitle": "On the shelf",
+    "savedBody": "\"{{title}}\" is on your shelf now",
+    "addAnother": "Add the next book",
+    "openBook": "Open this book",
+    "toShelf": "Go to the shelf",
+    "addedCount": "{{count}} added",
+    "queued": "Saved. Guessing the details in the background",
+    "nothingFound": "No details found. You can type them in",
+    "offlineSaved": "You're offline. Details will be filled in when you're back online",
+    "workingHint": "The first time can take a while because the Thai text reader has to load",
+    "step": {
+      "straighten": "Straightening the cover",
+      "barcode": "Looking for the ISBN barcode",
+      "lookup": "Looking up the book",
+      "ocr": "Reading the text on the cover"
+    },
+    "searchPlaceholder": "Title, author or ISBN",
+    "searchOffline": "Online search isn't available right now. You can type the details in",
+    "noSearchResults": "No results",
+    "typeManually": "Type the details"
+  },
+  "review": {
+    "title": "Check book details",
+    "empty": "Nothing left to check",
+    "working": "Guessing details…",
+    "ready": "Tap to check",
+    "confirm": "Confirm",
+    "confirmAll": "Confirm all",
+    "confirmed": "Confirmed"
+  },
+  "session": {
+    "left5": "Almost there",
+    "reading": "Reading",
+    "paused": "Paused",
+    "pomo": {
+      "work": "Reading, round {{round}}",
+      "break": "Rest your eyes"
+    },
+    "totalRead": "{{time}} read so far",
+    "ambience": "Room sounds",
+    "allowSensor": "Allow the motion sensor",
+    "noSensor": "This device can't tell when it's face down. Use pause and play instead.",
+    "sensorDenied": "Motion sensor permission was denied",
+    "flipToStart": "Lay your phone face down to start the timer",
+    "flipToContinue": "Lay your phone face down to keep reading",
+    "fiveDone": "5 minutes done",
+    "fiveDoneBody": "Keep going or stop here. Either way, it counts.",
+    "discard": "Discard",
+    "finish": "Finish",
+    "pause": "Pause",
+    "resume": "Resume",
+    "discardTitle": "Discard this session?",
+    "discardBody": "The time on the timer won't be saved",
+    "endTitle": "You read for {{time}}",
+    "of": "of {{max}}",
+    "finishedBook": "Finished the book",
+    "feel": "How was it?",
+    "keepReading": "Keep reading",
+    "forgotTitle": "Forgot to stop the timer?",
+    "forgotBody": "The timer has been running since {{time}}. If you didn't read that long, fix it here.",
+    "reallyRead": "Minutes you actually read",
+    "keepTimer": "I really did"
+  },
+  "mood": {
+    "fun": "Fun",
+    "calm": "Relaxed",
+    "hard": "Hard going",
+    "sleepy": "Sleepy",
+    "moved": "Moving"
+  },
+  "result": {
+    "title": "{{time}} read",
+    "finished": "Book finished",
+    "pages": "{{count}} pages",
+    "streak": "day streak",
+    "level": "level",
+    "levelUp": "level up",
+    "toNext": "{{xp}} XP to the next level",
+    "todayDone": "Today's goal is done",
+    "share": "Share card",
+    "rate": "Rate this book",
+    "again": "Read another round",
+    "quoteTip": "Found a line you liked? Save it on the book's page."
+  },
+  "ach": {
+    "unlocked": "Unlocked: {{name}}",
+    "many": "{{count}} achievements unlocked",
+    "list": {
+      "first_session": {
+        "name": "Page one",
+        "desc": "Your first reading session"
+      },
+      "first_book": {
+        "name": "First book",
+        "desc": "Finish a book"
+      },
+      "streak_3": {
+        "name": "Three in a row",
+        "desc": "Reach your goal 3 days in a row"
+      },
+      "streak_7": {
+        "name": "Full week",
+        "desc": "Reach your goal 7 days in a row"
+      },
+      "streak_30": {
+        "name": "Full month",
+        "desc": "Reach your goal 30 days in a row"
+      },
+      "streak_100": {
+        "name": "Hundred days",
+        "desc": "Reach your goal 100 days in a row"
+      },
+      "hour_1": {
+        "name": "First hour",
+        "desc": "Read for 1 hour in total"
+      },
+      "hour_10": {
+        "name": "Ten hours",
+        "desc": "Read for 10 hours in total"
+      },
+      "hour_50": {
+        "name": "Fifty hours",
+        "desc": "Read for 50 hours in total"
+      },
+      "books_5": {
+        "name": "Five books",
+        "desc": "Finish 5 books"
+      },
+      "books_12": {
+        "name": "A book a month",
+        "desc": "Finish 12 books"
+      },
+      "books_25": {
+        "name": "Twenty-five",
+        "desc": "Finish 25 books"
+      },
+      "deep_30": {
+        "name": "Lost in it",
+        "desc": "Read 30 minutes in one go"
+      },
+      "deep_60": {
+        "name": "Time flew",
+        "desc": "Read an hour in one go"
+      },
+      "night_owl": {
+        "name": "Night owl",
+        "desc": "Read after 11 pm"
+      },
+      "early_bird": {
+        "name": "Early bird",
+        "desc": "Read before 7 am"
+      },
+      "five_min_10": {
+        "name": "Five is enough",
+        "desc": "Use the 5-minute mode 10 times"
+      },
+      "comeback": {
+        "name": "Welcome back",
+        "desc": "Return to reading after a week away"
+      },
+      "big_book": {
+        "name": "Doorstopper",
+        "desc": "Finish a book of 500+ pages"
+      },
+      "genres_5": {
+        "name": "Explorer",
+        "desc": "Finish books in 5 genres"
+      },
+      "series_done": {
+        "name": "Complete set",
+        "desc": "Finish every volume you own of a series"
+      },
+      "quotes_10": {
+        "name": "Collector",
+        "desc": "Save 10 quotes"
+      },
+      "shelf_20": {
+        "name": "Filling up",
+        "desc": "Have 20 books on your shelf"
+      },
+      "let_go": {
+        "name": "Let it go",
+        "desc": "Stop a book that isn't for you and move on"
+      }
+    }
+  },
+  "stats": {
+    "title": "Stats",
+    "level": "Level",
+    "streak": "Streak",
+    "best": "best {{count}} days",
+    "freezesLeft": "{{count}} freezes left",
+    "yearGoal": "{{year}} goal",
+    "yearGoalBody": "{{done}} of {{goal}} books finished",
+    "month": "Month",
+    "year": "Year",
+    "prev": "Previous",
+    "next": "Next",
+    "hoursRead": "hours read",
+    "booksFinished": "books finished",
+    "daysRead": "days read",
+    "pages": "pages",
+    "pagesPerHour": "pages per hour",
+    "longest": "longest session (min)",
+    "sessions": "sessions",
+    "calendar": "Reading days",
+    "finishedBooks": "Finished",
+    "genres": "Genres",
+    "when": "When you read",
+    "whenBody": "You read most around {{hour}}:00",
+    "shareMonth": "Share this month",
+    "shareYear": "Share this year",
+    "achievements": "Achievements {{done}}/{{total}}",
+    "unlockedOn": "Unlocked on {{date}}",
+    "locked": "Not unlocked yet",
+    "setGoal": "How many books this year?",
+    "setGoalBody": "Pick something you can really do. Beating a goal feels better than missing one.",
+    "perMonth": "about {{n}} a month",
+    "weekdays": "M,T,W,T,F,S,S"
+  },
+  "ai": {
+    "title": "AI assistant",
+    "lead": "Builds a prompt with your shelf data to paste into ChatGPT, Claude or Gemini",
+    "randomTitle": "Can't decide? Pick for me",
+    "randomBody": "A random pick from your unread books",
+    "randomEmpty": "No unread books waiting",
+    "again": "Pick again",
+    "mine": "My templates",
+    "mineEmpty": "Save prompts you use often and the app fills in your book data",
+    "newTemplate": "New template",
+    "editTemplate": "Edit template",
+    "tplName": "Template name",
+    "tplNamePlaceholder": "e.g. Sum up today's chapter",
+    "tplBody": "Text",
+    "tplBodyHint": "Tap a chip below to insert data the app fills in",
+    "tplBodyPlaceholder": "e.g. Summarise what I learned from {currentBook} using these notes {notes}",
+    "deadline": "Finish by",
+    "moodLabel": "What do you feel like reading?",
+    "preview": "Text for the AI",
+    "editable": "You can edit it before copying",
+    "edited": "Edited",
+    "reset": "Rebuild from the latest data",
+    "copy": "Copy text",
+    "copyFail": "Couldn't copy. Long-press the text to copy it yourself",
+    "collageHint": "Attach the cover image too so the AI sees the real books. Its numbers match the list",
+    "openHint": "Or open an AI app with the text (it's copied too)",
+    "volume": "vol. {{n}}",
+    "mood": {
+      "light": "Light and easy",
+      "deep": "Serious, learn something",
+      "fun": "Fun and gripping",
+      "learn": "Self-improvement",
+      "short": "Short, quick finish"
+    },
+    "var": {
+      "unreadBooks": "unread books",
+      "readBooks": "finished books",
+      "favoriteGenres": "favourite genres",
+      "minutesPerDay": "minutes per day",
+      "mood": "mood",
+      "currentBook": "chosen book",
+      "pageNow": "current page",
+      "pagesLeft": "pages left",
+      "speed": "reading speed",
+      "deadline": "finish date",
+      "notes": "notes and quotes",
+      "ownedBooks": "all my books"
+    },
+    "tpl": {
+      "whatNext": {
+        "name": "What should I read next?",
+        "desc": "The AI weighs reviews, quality and your taste, then ranks with reasons"
+      },
+      "finishPlan": {
+        "name": "Plan to finish",
+        "desc": "A day-by-day plan to finish by your date"
+      },
+      "quiz": {
+        "name": "Quiz me",
+        "desc": "Questions on what you've read, no spoilers"
+      },
+      "summarizeNotes": {
+        "name": "Sum up my notes",
+        "desc": "Turn your notes and quotes into key ideas"
+      },
+      "similar": {
+        "name": "What to buy next",
+        "desc": "Based on books you loved, skipping ones you own"
+      },
+      "discuss": {
+        "name": "Talk about the book",
+        "desc": "Chat like a friend reading the same book"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "installTitle": "Install on your home screen",
+    "installBody": "Opens like an app, starts faster and keeps your data safer",
+    "installIOS": "In Safari, tap Share, then \"Add to Home Screen\". Your data won't be cleared when you don't open it for a while",
+    "install": "Install",
+    "language": "Language",
+    "room": "Room",
+    "customize": "Customise {{room}}",
+    "shelfColor": "Shelf colour",
+    "material": "Shelf material",
+    "materials": {
+      "wood": "Wood",
+      "metal": "Metal",
+      "painted": "Painted"
+    },
+    "rows": "Shelves per bookcase",
+    "time": "Time of day",
+    "day": "Day",
+    "night": "Night",
+    "decor": "Decorations",
+    "decorHint": "Some are earned with achievements",
+    "decorOn": "Placed",
+    "decorOff": "Tap to place",
+    "decorNeeds": "Unlock with: {{name}}",
+    "quality": "Graphics quality",
+    "qualityHint": "Lower it if your phone gets warm or laggy",
+    "q": {
+      "low": "Low",
+      "mid": "Medium",
+      "high": "High"
+    },
+    "sound": "Sound",
+    "soundOn": "Sound on",
+    "vol": {
+      "ui": "Buttons and taps",
+      "book": "Books",
+      "ambience": "Room sounds",
+      "reward": "Rewards"
+    },
+    "goals": "Goals",
+    "dailyGoal": "Read each day",
+    "yearGoal": "Books per year",
+    "pomoWork": "Pomodoro read (min)",
+    "pomoBreak": "Break (min)",
+    "reminder": "Reading reminder",
+    "reminderBody": "The app makes a daily event in your phone's calendar. It's more reliable than web app notifications",
+    "reminderTime": "Time",
+    "addToCalendar": "Add to calendar",
+    "reminderTitle": "Read a book",
+    "reminderNote": "Just {{min}} minutes is enough",
+    "reminderSaved": "Open the downloaded file to add it to your calendar",
+    "data": "Data and moving devices",
+    "dataBody": "Everything is stored only on this device. Export a backup file and import it on a new device",
+    "lastBackup": "Last backup {{date}}",
+    "neverBackedUp": "Never backed up",
+    "export": "Export backup",
+    "import": "Import backup",
+    "exported": "Exported. Keep the file somewhere safe",
+    "persisted": "The browser will keep your data",
+    "notPersisted": "The browser may clear data if storage runs low",
+    "persistAsk": "Keep it",
+    "wipe": "Delete all data on this device",
+    "wipeBody": "All books, sessions, quotes and photos will be gone. They can only come back from a backup file",
+    "wipeConfirm": "Delete everything",
+    "about": "All your data stays on your device. Nothing is sent to a server",
+    "merge": "Merge",
+    "replace": "Replace all",
+    "mergeBody": "Keep what's on this device and add the file's data. For the same book, the most recently edited version wins",
+    "replaceBody": "Delete everything on this device and use the file's data instead",
+    "importGo": "Import",
+    "imported": "Imported {{books}} books and {{sessions}} sessions",
+    "importBad": "This isn't an Ireadbook backup, or the file is damaged. Nothing was changed",
+    "importNewer": "This file comes from a newer app version. Update the app and try again",
+    "exportedTo": "Saved to {{path}}"
+  },
+  "decor": {
+    "plant": "Plant",
+    "mug": "Coffee mug",
+    "stack": "Book stack",
+    "candle": "Candle",
+    "clock": "Clock",
+    "globe": "Globe",
+    "cat": "Cat"
+  },
+  "backupNudge": {
+    "text": "Back up your shelf?",
+    "later": "Later",
+    "go": "Back up"
+  }
+}

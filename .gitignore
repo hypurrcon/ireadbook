@@ -1,0 +1,7 @@
+.superpowers
+dist
+node_modules
+playwright-report
+public/ocr
+test-results
+tsconfig.tsbuildinfo

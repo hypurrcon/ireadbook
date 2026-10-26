@@ -1,0 +1,51 @@
+@import '@fontsource/noto-serif-thai/400.css';
+@import '@fontsource/noto-serif-thai/600.css';
+@import '@fontsource/noto-serif-thai/700.css';
+@import '@fontsource/ibm-plex-sans-thai/400.css';
+@import '@fontsource/ibm-plex-sans-thai/500.css';
+@import '@fontsource/ibm-plex-sans-thai/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/600.css';
+
+:root {
+  --bg: #1d1714;
+  --surface: #2a211c;
+  --surface-2: #362a23;
+  --ink: #f1e6d2;
+  --ink-soft: #b8a68c;
+  --accent: #e0a458;
+  --accent-ink: #1d1714;
+  --line: rgba(241, 230, 210, 0.14);
+  --glow: rgba(224, 164, 88, 0.35);
+  --danger: #d9694f;
+  --ok: #8fb07c;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-display: 'Noto Serif Thai', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'IBM Plex Sans Thai', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --tabbar-h: 64px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  transition: background-color .4s ease, color .4s ease;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input, textarea, select { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.25; margin: 0; letter-spacing: -0.005em; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+a { color: inherit; text-decoration: none; }
